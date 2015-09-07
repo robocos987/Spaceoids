@@ -10,7 +10,7 @@ import com.waleed.Spaceoids.managers.GameInputProcessor;
 import com.waleed.Spaceoids.managers.GameKeys;
 import com.waleed.Spaceoids.managers.GameStateManager;
 import com.waleed.Spaceoids.managers.Jukebox;
-import com.waleed.Spaceoids.network.packets.Network;
+import com.waleed.Spaceoids.network.Network;
 
 public class Spaceoids implements ApplicationListener {
 

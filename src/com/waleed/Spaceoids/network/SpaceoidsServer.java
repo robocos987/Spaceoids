@@ -3,18 +3,17 @@ package com.waleed.Spaceoids.network;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Scanner;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import com.esotericsoftware.minlog.Log;
 import com.waleed.Spaceoids.entities.Asteroid;
 import com.waleed.Spaceoids.entities.Bullet;
 import com.waleed.Spaceoids.entities.Player;
-import com.waleed.Spaceoids.main.Spaceoids;
 import com.waleed.Spaceoids.network.packets.ConnectedPlayer;
 import com.waleed.Spaceoids.network.packets.PacketAddPlayer;
 import com.waleed.Spaceoids.network.packets.PacketAsteroids;
@@ -37,13 +36,11 @@ public class SpaceoidsServer extends Listener {
 
 	static Scanner scan;
 	
-	public ArrayList<Asteroid> asteroids;
-
+	Log log;
 
 	public static void main(String[] args) throws IOException{
 		scan = new Scanner(System.in);
 		server = new Server();
-		server.getKryo().register(Asteroid.class);
 		server.getKryo().register(ArrayList.class);
 		server.getKryo().register(Bullet.class);
 		server.getKryo().register(PacketAddPlayer.class);	
@@ -75,7 +72,7 @@ public class SpaceoidsServer extends Listener {
 		player.c = c;
 		player.id = c.getID();
 		player.player = new Player(x, y, new ArrayList<Bullet>());
-		asteroids = new ArrayList<Asteroid>();
+//		asteroids = new ArrayList<Asteroid>();
 
 
 
@@ -88,20 +85,7 @@ public class SpaceoidsServer extends Listener {
 			packet2.id = p.c.getID();
 			c.sendTCP(packet2);
 			
-			/*PacketAsteroids packetAsteroids = new PacketAsteroids();
-			for(int i = 0; i < 8; i++) {
-				Random rand = new Random();
-				asteroids.add(
-						new Asteroid(
-								MathUtils.random(Spaceoids.WIDTH),
-								MathUtils.random(Spaceoids.HEIGHT),
-								rand.nextInt(2) == 1 ? Asteroid.LARGE : Asteroid.SMALL
-								)
-						);
-			}
-			 packetAsteroids.asteroids = asteroids;
-			 c.sendUDP(packetAsteroids);
-			 */
+			
 		}
 		
 		
@@ -131,7 +115,7 @@ public class SpaceoidsServer extends Listener {
 			players.get(c.getID()).accelerationTimer = packet.acclerationTimer;
 
 			packet.id = c.getID();
-			server.sendToAllExceptTCP(c.getID(), packet);
+			server.sendToAllExceptUDP(c.getID(), packet);
 
 		}else if(o instanceof PacketUpdateRotation)
 		{
@@ -140,7 +124,7 @@ public class SpaceoidsServer extends Listener {
 			players.get(c.getID()).rotationSpeed = packet.rotationSpeed;
 
 			packet.id = c.getID();
-			server.sendToAllExceptTCP(c.getID(), packet);
+			server.sendToAllExceptUDP(c.getID(), packet);
 
 		}else if(o instanceof PacketUpdateAcceleration)
 		{
@@ -181,7 +165,7 @@ public class SpaceoidsServer extends Listener {
 			PacketUpdateBullet packet = (PacketUpdateBullet) o;
 			players.get(c.getID()).bullets = packet.bullet;
 			packet.id = c.getID();
-
+			
 			server.sendToAllExceptUDP(c.getID(), packet);
 		}else if(o instanceof PacketUpdateStats)
 		{

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.esotericsoftware.kryonet.Listener;
 import com.waleed.Spaceoids.network.packets.MPPlayer;
-import com.waleed.Spaceoids.network.packets.Network;
 
 public class SpaceoidsClient extends Listener {
 	public static Map<Integer, MPPlayer> players = new HashMap<Integer, MPPlayer>();

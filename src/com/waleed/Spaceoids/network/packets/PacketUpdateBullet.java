@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.waleed.Spaceoids.entities.Bullet;
 
-public class PacketUpdateBullet {
+public class PacketUpdateBullet{
 	
 	public int id;
 	public final int MAX_BULLETS = 4;

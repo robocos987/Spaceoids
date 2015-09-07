@@ -5,13 +5,15 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.waleed.Spaceoids.main.Spaceoids;
 import com.waleed.Spaceoids.managers.Jukebox;
-import com.waleed.Spaceoids.network.packets.Network;
+import com.waleed.Spaceoids.network.Network;
 import com.waleed.Spaceoids.network.packets.PacketUpdateAcceleration;
 import com.waleed.Spaceoids.network.packets.PacketUpdateBullet;
 import com.waleed.Spaceoids.network.packets.PacketUpdateDeath;
@@ -44,7 +46,6 @@ public class Player extends SpaceObject {
 	public float acceleratingTimer;
 
 	private float networkAcceleration;
-	private float networkDeceleration;
 	private float nAT;
 
 	public boolean hit;
@@ -89,6 +90,7 @@ public class Player extends SpaceObject {
 	public Player(ArrayList<Bullet> bullets) {
 
 		this.bullets = bullets;
+		this.networkBullets = new ArrayList<Bullet>();
 
 		x = Spaceoids.WIDTH / 2;
 		y = Spaceoids.HEIGHT / 2;
@@ -118,6 +120,8 @@ public class Player extends SpaceObject {
 	public Player(float x, float y, ArrayList<Bullet> bullets) {
 
 		this.bullets = bullets;
+		this.networkBullets = this.bullets;
+
 		this.x = x;
 		this.y = y;
 
@@ -206,11 +210,11 @@ public class Player extends SpaceObject {
 	public void incrementScore(long l) { score += l; }
 
 	public void shoot() {
+
 		if(bullets.size() == MAX_BULLETS) return;
 		bullets.add(new Bullet(x, y, radians));
 		Jukebox.play("shoot");
 		Spaceoids.cam.project(new Vector3(x, y, 0));
-
 
 	}
 
@@ -417,15 +421,17 @@ public class Player extends SpaceObject {
 			this.networkLives = this.extraLives;
 		}
 
-		if(this.bullets != this.networkBullets || this.hasShot)
+		if(networkBullets != bullets)
 		{
+
+			System.out.println(networkBullets != bullets);
 			PacketUpdateBullet packet = new PacketUpdateBullet();
-			packet.bullet = this.bullets;
+			packet.bullet = bullets;
 			network.client.sendUDP(packet);
 
-			this.networkBullets = bullets;
-			
+			networkBullets = bullets;
 		}
+
 
 		this.dt = delta;
 		// check if hit
