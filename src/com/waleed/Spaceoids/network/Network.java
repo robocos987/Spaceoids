@@ -3,6 +3,7 @@ package com.waleed.Spaceoids.network;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.badlogic.gdx.graphics.Color;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -38,6 +39,8 @@ public class Network extends Listener {
 		client = new Client();
 		client.getKryo().register(ArrayList.class);
 		client.getKryo().register(Bullet.class);
+		client.getKryo().register(float[].class);
+		client.getKryo().register(Color.class);
 		client.getKryo().register(PacketAddPlayer.class);	
 		client.getKryo().register(PacketAsteroids.class);
 		client.getKryo().register(PacketRemovePlayer.class);

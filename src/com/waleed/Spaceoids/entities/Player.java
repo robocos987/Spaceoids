@@ -216,6 +216,11 @@ public class Player extends SpaceObject {
 		Jukebox.play("shoot");
 		Spaceoids.cam.project(new Vector3(x, y, 0));
 
+		PacketUpdateBullet packet = new PacketUpdateBullet();
+		packet.bullet = bullets;
+		network.client.sendUDP(packet);
+
+
 	}
 
 	public void hit() {
@@ -421,16 +426,6 @@ public class Player extends SpaceObject {
 			this.networkLives = this.extraLives;
 		}
 
-		if(networkBullets != bullets)
-		{
-
-			System.out.println(networkBullets != bullets);
-			PacketUpdateBullet packet = new PacketUpdateBullet();
-			packet.bullet = bullets;
-			network.client.sendUDP(packet);
-
-			networkBullets = bullets;
-		}
 
 
 		this.dt = delta;

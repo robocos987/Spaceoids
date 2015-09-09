@@ -135,11 +135,6 @@ public class MultiplayerState extends GameState {
 				player.update(dt);
 
 				// update player bullets
-				/*
-				 * TODO:
-				 * May need:
-				 * Add shouldRemove boolean in bullet packet
-				 */
 				for(int i = 0; i < player.bullets.size(); i++) {
 					player.bullets.get(i).update(dt);
 					if(player.bullets.get(i).shouldRemove()) {
@@ -166,17 +161,17 @@ public class MultiplayerState extends GameState {
 			for(int i = 0; i < asteroids.size(); i++)
 			{
 				asteroids.get(i).update(dt);
-				/*
-				 * TODO:
-				 * Work on removing asteroids
-				 */
 			}
 
 			if(you.isDead())
 			{
-				you.reset();
-				you.loseLife();
+				if(you.getLives() > 0)
+				{
+					you.reset();
+					you.loseLife();
+				}
 			}
+
 
 			checkCollisions();
 		}
@@ -358,26 +353,30 @@ public class MultiplayerState extends GameState {
 
 				/*for(int i = 0; i < you.bullets.size(); i++)
 				{
-					Bullet bullet = you.bullets.get(i);
-					if(bullet.intersects(player))
+					if(you.bullets.get(i).contains(player.getX(), player.getY()))
 					{
+						you.bullets.remove(i);
+						i--;
 						you.incrementScore(30);
+						Jukebox.play("explode");
 					}
 				}
 
 				for(int i = 0; i < player.bullets.size(); i++)
 				{
-					Bullet bullet = player.bullets.get(i);
-					if(bullet.intersects(you))
-					{
+					if(player.bullets.get(i).contains(you.getX(), you.getY()))
+					{ 
 						you.hit();
-						you.decreaseScore(30);
+						you.decreaseScore(30);						
+						Jukebox.play("explode");
 					}
+
 				}*/
 			}
-
 		}
+
 	}
+
 
 	@Override
 	public void handleInput() {

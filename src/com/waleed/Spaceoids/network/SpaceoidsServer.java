@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import com.badlogic.gdx.graphics.Color;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
+import com.esotericsoftware.minlog.Log.Logger;
 import com.waleed.Spaceoids.entities.Asteroid;
 import com.waleed.Spaceoids.entities.Bullet;
 import com.waleed.Spaceoids.entities.Player;
@@ -33,7 +35,9 @@ public class SpaceoidsServer extends Listener {
 	static Server server;
 	static final int port = 911;
 	static Map<Integer, ConnectedPlayer> players = new HashMap<Integer, ConnectedPlayer>();
-
+	
+	
+	
 	static Scanner scan;
 	
 	Log log;
@@ -43,6 +47,8 @@ public class SpaceoidsServer extends Listener {
 		server = new Server();
 		server.getKryo().register(ArrayList.class);
 		server.getKryo().register(Bullet.class);
+		server.getKryo().register(float[].class);
+		server.getKryo().register(Color.class);
 		server.getKryo().register(PacketAddPlayer.class);	
 		server.getKryo().register(PacketAsteroids.class);
 		server.getKryo().register(PacketRemovePlayer.class);
@@ -61,7 +67,10 @@ public class SpaceoidsServer extends Listener {
 		server.bind(port, port + 1);
 		server.start();
 		server.addListener(new SpaceoidsServer());
-		System.out.println("The server is ready");
+//		System.out.println("The server is ready");
+		
+	    Log.setLogger(new Logger());
+	    Log.set(Log.LEVEL_TRACE);
 	}
 	
 	@Override
@@ -74,7 +83,8 @@ public class SpaceoidsServer extends Listener {
 		player.player = new Player(x, y, new ArrayList<Bullet>());
 //		asteroids = new ArrayList<Asteroid>();
 
-
+		
+	
 
 		PacketAddPlayer packet = new PacketAddPlayer();
 		packet.id = c.getID();

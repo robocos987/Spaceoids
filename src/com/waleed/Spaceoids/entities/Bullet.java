@@ -2,6 +2,9 @@ package com.waleed.Spaceoids.entities;
 
 import java.util.Random;
 
+
+
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
@@ -12,9 +15,18 @@ public class Bullet extends SpaceObject {
 	private float lifeTimer;
 
 	private boolean remove;
-
+	
+	private Color color;
+	
+	
+	public Bullet()
+	{
+		
+	}
+	
 	public Bullet(float x, float y, float radians) {
-
+		
+		this.color = Color.WHITE;
 		this.x = x;
 		this.y = y;
 		this.radians = radians;
@@ -45,11 +57,13 @@ public class Bullet extends SpaceObject {
 	}
 
 	public void draw(ShapeRenderer sr) {
-		sr.setColor(1, 1, 1, 1);
+		sr.setColor(1, 0, 0, 1);
 		sr.begin(ShapeType.Circle);
 		sr.circle(x - width / 2, y - height / 2, width / 2);
 		sr.end();
 	}
+	
+
 
 }
 
