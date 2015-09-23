@@ -1,8 +1,5 @@
 package com.waleed.Spaceoids.network.packets;
 
-
-public class PacketRemovePlayer {
-
+public class PacketKickPlayer {
 	public int id;
-	public String reason;
 }

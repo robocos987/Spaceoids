@@ -21,7 +21,7 @@ public class SpaceObject {
 	protected int width;
 	protected int height;
 
-	protected float[] shapex;
+	public float[] shapex;
 	protected float[] shapey;
 
 	public float getX() { return x; }
@@ -29,7 +29,7 @@ public class SpaceObject {
 
 	public float[] getShapex() { return shapex; }
 	public float[] getShapey() { return shapey; }
-	public boolean specialMove() { return special; }
+	public boolean getSpecialMove() { return special; }
 
 	public void setPosition(float x, float y) {
 		this.x = x;
@@ -40,16 +40,23 @@ public class SpaceObject {
 	public boolean intersects(SpaceObject other) {
 		float[] sx = other.getShapex();
 		float[] sy = other.getShapey();
-		for(int i = 0; i < sx.length; i++) {
-			if(contains(sx[i], sy[i])) {
-				return true;
+		
+		for(int i = 0; i < sx.length; i++)
+		{
+			for(int j = 0; j < sy.length; j++)
+			{
+//				System.out.println(sx[i]);
+				if(contains(sx[i], sy[j]))
+				{
+					return true;
+				}
 			}
 		}
 		return false;
 	}
 
 	public boolean contains(float x, float y) {
-		boolean b = false;
+		boolean contains = false;
 		for(int i = 0, j = shapex.length - 1;
 				i < shapex.length;
 				j = i++) {
@@ -57,10 +64,10 @@ public class SpaceObject {
 					(x < (shapex[j] - shapex[i]) *
 							(y - shapey[i]) / (shapey[j] - shapey[i])
 							+ shapex[i])) {
-				b = !b;
+				contains = !contains;
 			}
 		}
-		return b;
+		return contains;
 	}
 
 	protected void wrap() {

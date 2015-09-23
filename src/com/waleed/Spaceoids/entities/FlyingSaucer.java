@@ -2,6 +2,7 @@ package com.waleed.Spaceoids.entities;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
@@ -137,11 +138,11 @@ public class FlyingSaucer extends SpaceObject {
 				else if(type == SMALL) {
 					radians = MathUtils.atan2(player.y - y, player.x - x);
 				}
-				bullets.add(new Bullet(x, y, radians));
+				bullets.add(new Bullet(x, y, radians, Color.WHITE));
 				Jukebox.play("saucershoot");
 			}
 		}
-		// move along path
+		// move along path 
 		pathTimer += dt;
 
 		// move forward

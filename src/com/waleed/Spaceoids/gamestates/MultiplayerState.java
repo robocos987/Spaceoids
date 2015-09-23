@@ -11,9 +11,11 @@ import java.util.List;
 
 
 
+
 import org.lwjgl.input.Keyboard;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -43,8 +45,8 @@ public class MultiplayerState extends GameState {
 	public SpaceoidsClient client;
 
 	private BitmapFont titleFont;
-	public static BitmapFont font;
-	public static BitmapFont idFont;
+	private BitmapFont font;
+	private BitmapFont idFont;
 	private BitmapFont firstNameFont;
 	private BitmapFont lastNameFont;
 
@@ -52,8 +54,8 @@ public class MultiplayerState extends GameState {
 	private Player hudPlayer;
 
 	private ArrayList<Bullet> yourBullets;
-	public  ArrayList<Asteroid> asteroids;
 	private ArrayList<Particle> particles;
+	public  ArrayList<Asteroid> asteroids;
 
 
 	public static MultiplayerState INSTANCE;
@@ -63,31 +65,28 @@ public class MultiplayerState extends GameState {
 	private String ip;
 	int port;
 
-	public int total;
+	public int totalPlayers;
 	public boolean inGame;
-
-	boolean up, down, left, right;
+	
+	public boolean kicked;
 
 	public MultiplayerState(GameStateManager gsm) {
 		super(gsm);
 		this.gsm = gsm;
 		INSTANCE = this;
 		hudPlayer = new Player(null);
+		kicked = false;
 	}		
 
 	@Override
 	public void init() {
 		sb = new SpriteBatch();
 		sr = new ShapeRenderer();
-		client = new SpaceoidsClient(this.ip, this.port);
-
 		yourBullets = new ArrayList<Bullet>();
 		particles = new ArrayList<Particle>();
 		asteroids = new ArrayList<Asteroid>();
-
 		you = new Player(yourBullets);
-
-
+		client = new SpaceoidsClient(this.ip, this.port, you);
 
 		FreeTypeFontGenerator gen = new FreeTypeFontGenerator(
 				Gdx.files.internal("fonts/Hyperspace Bold.ttf")
@@ -172,7 +171,6 @@ public class MultiplayerState extends GameState {
 				}
 			}
 
-
 			checkCollisions();
 		}
 	}
@@ -227,6 +225,9 @@ public class MultiplayerState extends GameState {
 			{
 				state = 0;
 			}
+		}else if(client.isKicked())
+		{
+			state = 2;
 		}else
 		{
 			state = 1;
@@ -257,17 +258,20 @@ public class MultiplayerState extends GameState {
 
 		}else if(state == 2)
 		{
+			String message = "KICKED FOR \"" + client.network.getReason().toUpperCase() + "\"";
+			
 			sb.begin();
-			float width = lastNameFont.getBounds("KICKED").width;
+			float width = lastNameFont.getBounds(message).width;
 			lastNameFont.draw(sb, 
-					"KICKED", 
+					message.toUpperCase(), 
 					(Spaceoids.WIDTH - width) / 2, 
 					300);
+			firstNameFont.draw(sb, "PRESS ESCAPE TO GO BACK", (Spaceoids.WIDTH - ((350 * 2) - 200)) / 2, 200);
 			sb.end();
 
 		}else if(state == 3)
 		{
-			total = client.players.size();
+			totalPlayers = client.players.size();
 			for(MPPlayer mpPlayer: client.players.values())
 			{
 				PlayerMP player = mpPlayer.getPlayer();
@@ -311,14 +315,12 @@ public class MultiplayerState extends GameState {
 			for(MPPlayer mpPlayer: client.players.values())
 			{
 				PlayerMP player = mpPlayer.getPlayer();
-				idFont.draw(sb, "Score: " + player.getScore(), player.getX() - 20, player.getY() + 10);
+				idFont.draw(sb, "ID: " + player.getID(), player.getX() - 20, player.getY() + 10);
 			}
 
-
 			font.draw(sb, Long.toString(you.getScore()), 30, 80);
-			//			font.draw(sb, "Expiremental Multiplayer Build", 30, 60);
-			font.draw(sb, "Asteroids: " + asteroids.size(), 30, 60);
-			font.draw(sb, "Players on server:" + total, 30, 40);
+			font.draw(sb, "Your ID:  " + you.getID(), 30, 60);
+			font.draw(sb, "Players on server:" + totalPlayers, 30, 40);
 
 
 			sb.end();
@@ -350,28 +352,20 @@ public class MultiplayerState extends GameState {
 					player.hit();
 					System.out.println("Player crashed into a YOU");
 				}
-
-				/*for(int i = 0; i < you.bullets.size(); i++)
-				{
-					if(you.bullets.get(i).contains(player.getX(), player.getY()))
-					{
-						you.bullets.remove(i);
-						i--;
-						you.incrementScore(30);
-						Jukebox.play("explode");
-					}
-				}
-
+				
 				for(int i = 0; i < player.bullets.size(); i++)
 				{
-					if(player.bullets.get(i).contains(you.getX(), you.getY()))
-					{ 
-						you.hit();
-						you.decreaseScore(30);						
-						Jukebox.play("explode");
-					}
+					if(player.bullets.get(i) != null)
+					{
+						if(you.contains(player.bullets.get(i).getX(), player.bullets.get(i).getY()))
+						{ 
+							you.hit();
+							you.decreaseScore(30);						
+							Jukebox.play("explode");
+						}
 
-				}*/
+					} 
+				} 
 			}
 		}
 
@@ -388,9 +382,10 @@ public class MultiplayerState extends GameState {
 			for(int i = 0; i < 8; i++) {
 				createParticles(you.getX(), you.getY());
 			}
+
 		}
 
-		if(state == 1 && GameKeys.isDown(GameKeys.ESCAPE))
+		if(state < 3 && GameKeys.isDown(GameKeys.ESCAPE))
 		{
 			gsm.setState(gsm.MENU);
 		}
@@ -403,6 +398,7 @@ public class MultiplayerState extends GameState {
 			if(GameKeys.isPressed(GameKeys.SPACE)) {
 				you.shoot();
 			}
+
 		}
 	}
 

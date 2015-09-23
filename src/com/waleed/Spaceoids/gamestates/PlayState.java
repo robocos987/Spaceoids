@@ -19,7 +19,6 @@ import com.waleed.Spaceoids.main.Spaceoids;
 import com.waleed.Spaceoids.managers.GameKeys;
 import com.waleed.Spaceoids.managers.GameStateManager;
 import com.waleed.Spaceoids.managers.Jukebox;
-import com.waleed.Spaceoids.managers.Rumble;
 import com.waleed.Spaceoids.managers.Save;
 
 public class PlayState extends GameState {
@@ -32,7 +31,6 @@ public class PlayState extends GameState {
 	private BitmapFont font;
 	private Player hudPlayer;
 
-	//public Rumble rumble;
 
 	private int ships = 0;
 
@@ -201,7 +199,6 @@ public class PlayState extends GameState {
 
 
 
-		System.out.println("NOT BOSS TIME :(");
 		for(int i = 0; i < numToSpawn; i++) {
 
 			float x = MathUtils.random(Spaceoids.WIDTH);
@@ -214,7 +211,6 @@ public class PlayState extends GameState {
 			while(dist < 100) {
 				x = MathUtils.random(Spaceoids.WIDTH);
 				y = MathUtils.random(Spaceoids.HEIGHT);
-				//				dx = a, dy = b, dist = c ^ 2
 				dx = x - player.getX(); 
 				dy = y - player.getY();
 				dist = (float) Math.sqrt(dx * dx + dy * dy);
@@ -639,14 +635,10 @@ public class PlayState extends GameState {
 
 	private void checkSpecialMove()
 	{
-
-
 		if(!player.isHit()) {
 			for(int i = 0; i < asteroids.size() / 2; i++) {
 				Asteroid a = asteroids.get(i);
-				System.out.println("TOTAL: " + asteroids.size() + "\n" + "i potential: " + asteroids.size() / 2);
 				if(a.specialMove()) {
-					//					if(a.getType() == a.SMALL)
 					asteroids.remove(i);
 					i--;
 					splitAsteroids(a);
@@ -742,7 +734,6 @@ public class PlayState extends GameState {
 			player.setRight(GameKeys.isDown(GameKeys.RIGHT));
 			player.setUp(GameKeys.isDown(GameKeys.UP));
 			if(GameKeys.isPressed(GameKeys.SPACE)) {
-				
 				player.shoot();
 			}
 			

@@ -8,6 +8,7 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.waleed.Spaceoids.entities.Bullet;
+import com.waleed.Spaceoids.entities.Player;
 import com.waleed.Spaceoids.entities.PlayerMP;
 import com.waleed.Spaceoids.gamestates.MultiplayerState;
 import com.waleed.Spaceoids.network.packets.MPPlayer;
@@ -22,6 +23,7 @@ import com.waleed.Spaceoids.network.packets.PacketUpdateHit;
 import com.waleed.Spaceoids.network.packets.PacketUpdatePosition;
 import com.waleed.Spaceoids.network.packets.PacketUpdateRotation;
 import com.waleed.Spaceoids.network.packets.PacketUpdateStats;
+import com.waleed.Spaceoids.network.packets.PacketWelcome;
 
 
 public class Network extends Listener {
@@ -30,12 +32,15 @@ public class Network extends Listener {
 	String ip;
 	int port;
 	public String reason;
-	
-	
-	public void connect(String ip, int port, int udport)
+	Player player;
+	public boolean kicked;
+
+
+	public void connect(String ip, int port, int udport, Player player)
 	{
 		this.ip = ip;
 		this.port = port;
+		this.player = player;
 		client = new Client();
 		client.getKryo().register(ArrayList.class);
 		client.getKryo().register(Bullet.class);
@@ -53,6 +58,7 @@ public class Network extends Listener {
 		client.getKryo().register(PacketUpdatePosition.class);
 		client.getKryo().register(PacketUpdateRotation.class);
 		client.getKryo().register(PacketUpdateStats.class);
+		client.getKryo().register(PacketWelcome.class);
 		client.addListener(this);
 
 		client.start();
@@ -67,7 +73,13 @@ public class Network extends Listener {
 	@Override
 	public void received(Connection c, Object o)
 	{
-		if(o instanceof PacketAddPlayer)
+		if(o instanceof PacketWelcome)
+		{
+			PacketWelcome packet = (PacketWelcome) o;
+			this.player.id = packet.id;
+			System.out.println(this.player.id);
+		}
+		else if(o instanceof PacketAddPlayer)
 		{
 			PacketAddPlayer packet = (PacketAddPlayer) o;
 			MPPlayer newPlayer = new MPPlayer();
@@ -76,11 +88,24 @@ public class Network extends Listener {
 			newPlayer.setPlayer(playerMP, SpaceoidsClient.players.values().size() > 0);	
 			SpaceoidsClient.players.put(packet.id, newPlayer);
 
+			PacketUpdateStats packetStats = new PacketUpdateStats();
+			packetStats.extraLives = this.player.getLives();
+			packetStats.score = this.player.getScore();
+
+			this.client.sendUDP(packetStats);
+
 		}else if(o instanceof PacketRemovePlayer)
 		{
 			PacketRemovePlayer packet = (PacketRemovePlayer) o;
-			SpaceoidsClient.players.remove(packet.id);
-
+			if(packet.id != this.player.id)
+			{
+				SpaceoidsClient.players.remove(packet.id);
+			}else
+			{
+				reason = packet.reason;
+				this.kicked = true;
+			}
+			
 		}else if(o instanceof PacketUpdatePosition)
 		{
 			PacketUpdatePosition packet = (PacketUpdatePosition) o;
@@ -130,7 +155,15 @@ public class Network extends Listener {
 			PacketAsteroids packet = (PacketAsteroids) o;
 			MultiplayerState.INSTANCE.asteroids = packet.asteroids;
 		}
-		System.out.println("Recieved: " + o.getClass().getCanonicalName());
 
+		if(!(o.getClass().getCanonicalName().contains("UpdatePosition") || o.getClass().getCanonicalName().contains("UpdateAcceleration")
+				|| o.getClass().getCanonicalName().contains("UpdateHit")))
+			System.out.println("Recieved: " + o.getClass().getCanonicalName());
+
+	}
+	
+	public String getReason()
+	{
+		return reason;
 	}
 }

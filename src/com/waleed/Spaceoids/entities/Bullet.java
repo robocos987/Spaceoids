@@ -24,9 +24,9 @@ public class Bullet extends SpaceObject {
 		
 	}
 	
-	public Bullet(float x, float y, float radians) {
+	public Bullet(float x, float y, float radians, Color color) {
 		
-		this.color = Color.WHITE;
+		this.color = color;
 		this.x = x;
 		this.y = y;
 		this.radians = radians;
@@ -57,12 +57,11 @@ public class Bullet extends SpaceObject {
 	}
 
 	public void draw(ShapeRenderer sr) {
-		sr.setColor(1, 0, 0, 1);
+		sr.setColor(color);
 		sr.begin(ShapeType.Circle);
 		sr.circle(x - width / 2, y - height / 2, width / 2);
 		sr.end();
 	}
-	
 
 
 }

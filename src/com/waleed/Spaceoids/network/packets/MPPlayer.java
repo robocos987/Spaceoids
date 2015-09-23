@@ -29,7 +29,7 @@ public class MPPlayer {
 	public ArrayList<Bullet> bullets;
 	public long score;
 	public int lives;
-	
+		
 	public void setPlayer(PlayerMP player, boolean firstPlayer) {
 		float x = 20;
 		float y = 20;
@@ -54,6 +54,8 @@ public class MPPlayer {
 		player.up = this.up;
 		player.id = this.id;
 		player.bullets = this.bullets;
+		player.score = score;
+		player.extraLives = lives;
 		return this.player;
 	}
 

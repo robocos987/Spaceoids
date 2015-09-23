@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
@@ -84,6 +85,7 @@ public class Player extends SpaceObject {
 	private boolean networkUp;
 
 	public boolean hasShot;
+	public int id;
 
 	public static boolean remove = false;
 
@@ -204,6 +206,7 @@ public class Player extends SpaceObject {
 	public long getScore() { return score; }
 	public int getLives() { return extraLives; }
 	public boolean shouldRemove() { return remove; }
+	public int getID() { return id; }
 
 
 	public void loseLife() { extraLives--; }
@@ -212,14 +215,16 @@ public class Player extends SpaceObject {
 	public void shoot() {
 
 		if(bullets.size() == MAX_BULLETS) return;
-		bullets.add(new Bullet(x, y, radians));
+		bullets.add(new Bullet(x, y, radians, Color.WHITE));
 		Jukebox.play("shoot");
 		Spaceoids.cam.project(new Vector3(x, y, 0));
 
-		PacketUpdateBullet packet = new PacketUpdateBullet();
-		packet.bullet = bullets;
-		network.client.sendUDP(packet);
-
+		if(network != null && network.client.isConnected())
+		{
+			PacketUpdateBullet packet = new PacketUpdateBullet();
+			packet.bullet = bullets;
+			network.client.sendUDP(packet);
+		}
 
 	}
 
@@ -420,7 +425,7 @@ public class Player extends SpaceObject {
 			PacketUpdateStats packet = new PacketUpdateStats();
 			packet.score = this.score;
 			packet.extraLives = this.extraLives;
-			network.client.sendTCP(packet);
+			network.client.sendUDP(packet);
 
 			this.networkScore = this.score;
 			this.networkLives = this.extraLives;

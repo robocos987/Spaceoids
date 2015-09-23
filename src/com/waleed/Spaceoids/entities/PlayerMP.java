@@ -4,10 +4,10 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector3;
 import com.waleed.Spaceoids.main.Spaceoids;
 import com.waleed.Spaceoids.managers.Jukebox;
 
@@ -38,8 +38,8 @@ public class PlayerMP extends SpaceObject {
 	public Line2D.Float[] hitLines;
 	public Point2D.Float[] hitLinesVector;
 	
-	private long score;
-	private int extraLives;
+	public long score;
+	public int extraLives;
 	private long requiredScore;
 	
 	public boolean deathWrap = false;
@@ -59,6 +59,9 @@ public class PlayerMP extends SpaceObject {
 		
 		x = Spaceoids.WIDTH / 2;
 		y = Spaceoids.HEIGHT / 2;
+		
+		this.x = x;
+		this.y = y;
 		
 		maxSpeed = 300;
 		acceleration = 200;
@@ -106,7 +109,6 @@ public class PlayerMP extends SpaceObject {
 			MathUtils.cos(radians + 2.8f),
 			MathUtils.sin(radians + 2.8f)
 		);
-		
 	}
 
 	
@@ -178,12 +180,11 @@ public class PlayerMP extends SpaceObject {
 	
 	public void shoot() {
 		if(bullets.size() == MAX_BULLETS) return;
-		bullets.add(new Bullet(x, y, radians));
-		Jukebox.play("shoot");
-//		Spaceoids.cam.position.x = this.x;
-//		Spaceoids.cam.position.y = this.y;
-
+		bullets.add(new Bullet(x, y, radians, new Color(1, 500, 1, 10)));
+		Jukebox.play("shoot"); 
 	}
+	
+	
 	
 	public void hit() {
 		
