@@ -23,6 +23,9 @@ public class PlayerMP extends SpaceObject {
 	private boolean right;
 	public boolean up;
 	
+	//values sent from the server
+	public float netX, netY;
+	
 	private float maxSpeed;
 	public float acceleration;
 	public float deceleration;
