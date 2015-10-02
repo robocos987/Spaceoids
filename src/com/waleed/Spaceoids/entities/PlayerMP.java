@@ -31,7 +31,8 @@ public class PlayerMP extends SpaceObject {
 	public float deceleration;
 	public float acceleratingTimer;
 	public float dt;
-	
+
+
 	public boolean hit;
 	public boolean dead;
 
