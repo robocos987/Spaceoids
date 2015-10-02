@@ -175,42 +175,6 @@ public class MultiplayerState extends GameState {
 		}
 	}
 
-
-
-
-
-	public String getIP()
-	{		
-		String ipAddr = "";
-
-		try {
-
-			InetAddress inetAddr = InetAddress.getLocalHost();
-
-			byte[] addr = inetAddr.getAddress();
-
-			// Convert to dot representation
-			for (int i = 0; i < addr.length; i++) {
-				if (i > 0) {
-					ipAddr += ".";
-				}
-				ipAddr += addr[i] & 0xFF;
-			}
-
-			String hostname = inetAddr.getHostName();
-
-			System.out.println("IP Address: " + ipAddr);
-			System.out.println("Hostname: " + hostname);
-
-		}
-		catch (UnknownHostException e) {
-			System.out.println("Host not found: " + e.getMessage());
-		}
-		return ipAddr;
-	}
-
-
-
 	@Override
 	public void draw() {
 		sb.setProjectionMatrix(Spaceoids.cam.combined);
