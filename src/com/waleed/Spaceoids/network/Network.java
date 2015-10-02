@@ -109,11 +109,11 @@ public class Network extends Listener {
 		}else if(o instanceof PacketUpdatePosition)
 		{
 			PacketUpdatePosition packet = (PacketUpdatePosition) o;
-			SpaceoidsClient.players.get(packet.id).x = packet.x;
-			SpaceoidsClient.players.get(packet.id).y = packet.y;
+			SpaceoidsClient.players.get(packet.id).netX = packet.x;
+			SpaceoidsClient.players.get(packet.id).netY = packet.y;
 
 			SpaceoidsClient.players.get(packet.id).dx = packet.dx;
-			SpaceoidsClient.players.get(packet.id).dy = packet.x;
+			SpaceoidsClient.players.get(packet.id).dy = packet.dy;
 		}else if(o instanceof PacketUpdateAcceleration)
 		{
 			PacketUpdateAcceleration packet = (PacketUpdateAcceleration) o;
