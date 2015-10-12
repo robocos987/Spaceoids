@@ -1,6 +1,6 @@
 package com.waleed.Spaceoids.network.packets;
 
-public class PacketUpdatePosition {
+public class PacketChatMessage {
 	public int id;
-	public float x, y;
+	public String message;
 }

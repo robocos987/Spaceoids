@@ -5,8 +5,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.apache.commons.collections4.CollectionUtils;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -17,18 +15,20 @@ import com.waleed.Spaceoids.managers.Jukebox;
 import com.waleed.Spaceoids.network.Network;
 import com.waleed.Spaceoids.network.packets.PacketUpdateAcceleration;
 import com.waleed.Spaceoids.network.packets.PacketUpdateBullet;
+import com.waleed.Spaceoids.network.packets.PacketUpdateDX;
+import com.waleed.Spaceoids.network.packets.PacketUpdateDY;
 import com.waleed.Spaceoids.network.packets.PacketUpdateDeath;
 import com.waleed.Spaceoids.network.packets.PacketUpdateFlames;
 import com.waleed.Spaceoids.network.packets.PacketUpdateHit;
-import com.waleed.Spaceoids.network.packets.PacketUpdatePosition;
 import com.waleed.Spaceoids.network.packets.PacketUpdateRotation;
 import com.waleed.Spaceoids.network.packets.PacketUpdateStats;
+import com.waleed.Spaceoids.network.packets.PacketUpdateX;
+import com.waleed.Spaceoids.network.packets.PacketUpdateY;
 
 public class Player extends SpaceObject {
 
 	private final int MAX_BULLETS = 4;
 	public ArrayList<Bullet> bullets;
-	private ArrayList<Bullet> networkBullets;
 
 	private float[] flamex;
 	private float[] flamey;
@@ -36,8 +36,6 @@ public class Player extends SpaceObject {
 	private boolean left;
 	private boolean right;
 	private boolean up;
-
-	private boolean netLeft, netRight, netUp;
 
 	private float netRadians;
 
@@ -92,7 +90,6 @@ public class Player extends SpaceObject {
 	public Player(ArrayList<Bullet> bullets) {
 
 		this.bullets = bullets;
-		this.networkBullets = new ArrayList<Bullet>();
 
 		x = Spaceoids.WIDTH / 2;
 		y = Spaceoids.HEIGHT / 2;
@@ -122,7 +119,6 @@ public class Player extends SpaceObject {
 	public Player(float x, float y, ArrayList<Bullet> bullets) {
 
 		this.bullets = bullets;
-		this.networkBullets = this.bullets;
 
 		this.x = x;
 		this.y = y;
@@ -345,18 +341,28 @@ public class Player extends SpaceObject {
 	public void updateMP(float delta)
 	{
 		network = Spaceoids.getClient();
-		if(this.dx != this.netX || this.dy != this.netDY || this.x != this.netX || this.y != this.netY)
+
+		if(this.x != this.netX)
 		{
-			PacketUpdatePosition pup = new PacketUpdatePosition();
-			pup.dx = this.dx;
-			pup.dy = this.dy;
-			pup.x = this.x;
-			pup.y = this.y;
 
-			network.client.sendUDP(pup);
+			PacketUpdateX packet = new PacketUpdateX();
+			packet.x = this.x;
 
-			this.setNetPosition(x, y);
-			this.setDeltaPosition(dx, dy);
+			network.client.sendUDP(packet);
+
+			this.netX = x;
+		}
+
+		if(this.y != this.netY)
+		{
+
+			PacketUpdateY packet = new PacketUpdateY();
+			packet.y = this.y;
+
+			network.client.sendUDP(packet);
+
+			this.netY = y;
+
 		}
 
 		if(this.hit != this.networkHit || this.hitTimer != this.netHitTimer || this.hitTime != this.netHitTime
@@ -370,9 +376,7 @@ public class Player extends SpaceObject {
 			packet.netHitLinesVec = this.nLV;
 
 			network.client.sendUDP(packet);
-
-			//			this.nTL = this.hitLines;			
-			//			this.nLV = this.hitLinesVector;
+			
 			this.networkHit = this.hit;
 			this.netHitTimer = this.hitTimer;
 			this.netHitTime = this.hitTime;
@@ -507,15 +511,7 @@ public class Player extends SpaceObject {
 		wrap();
 	}
 
-	private void setNetPosition(float x, float y) {
-		this.netX = x;
-		this.netY = y;
-	}
-
-	public void setDeltaPosition(float dx, float dy) {
-		this.netDX = dx;
-		this.netDY = dy;
-	}
+	
 
 
 	public void draw(ShapeRenderer sr) {
@@ -566,8 +562,6 @@ public class Player extends SpaceObject {
 	public void decreaseScore(int i) {
 		this.score -= i;
 	}
-
-
 
 }
 

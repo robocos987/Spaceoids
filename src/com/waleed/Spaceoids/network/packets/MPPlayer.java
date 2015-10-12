@@ -29,6 +29,8 @@ public class MPPlayer {
 	public ArrayList<Bullet> bullets;
 	public long score;
 	public int lives;
+	public float newX, newY;
+	
 		
 	public void setPlayer(PlayerMP player, boolean firstPlayer) {
 		float x = 20;
@@ -45,7 +47,6 @@ public class MPPlayer {
 		player.y = this.y;
 		player.acceleratingTimer = this.accelerationTimer;
 		player.dead = this.death;
-		player.dx = this.dx;
 		player.rotationSpeed = this.rotationSpeed;
 		player.radians = this.radians;
 		player.hit = this.hit;
@@ -57,6 +58,21 @@ public class MPPlayer {
 		player.score = score;
 		player.extraLives = lives;
 		return this.player;
+	}
+
+	public void dispose() {
+		this.player.dispose();
+	}
+
+	public void setX(float newX) {
+//		this.x = player.lerp(x, newX, player.dt);
+		this.x = newX;
+	}
+	
+	public void setY(float newY)
+	{
+//		this.y = player.lerp(y, newY, player.dt);
+		this.y = newY;
 	}
 
 }

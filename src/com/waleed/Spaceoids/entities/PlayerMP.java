@@ -31,6 +31,8 @@ public class PlayerMP extends SpaceObject {
 	
 	public boolean hit;
 	public boolean dead;
+	
+	public float time;
 
 	
 	public float hitTimer;
@@ -49,6 +51,7 @@ public class PlayerMP extends SpaceObject {
 	public static boolean remove = false;
 	
 	public int id;
+	public float ping;
 		
 	public PlayerMP(int id, float x, float y, ArrayList<Bullet> bullets) {
 		
@@ -227,7 +230,7 @@ public class PlayerMP extends SpaceObject {
 	public void update(float dt) {
 		this.dt = dt;
 		// check if hit
-		
+				
 		if(hit) {
 			hitTimer += dt;
 			if(hitTimer > hitTime) {
@@ -260,7 +263,6 @@ public class PlayerMP extends SpaceObject {
 			radians -= rotationSpeed * dt;
 		}
 		
-		// accelerating
 		if(up) {
 			dx += MathUtils.cos(radians) * acceleration * dt;
 			dy += MathUtils.sin(radians) * acceleration * dt;
@@ -273,16 +275,6 @@ public class PlayerMP extends SpaceObject {
 			acceleratingTimer = 0;
 		}
 		
-		// deceleration
-		float vec = (float) Math.sqrt(dx * dx + dy * dy);
-		if(vec > 0) {
-			dx -= (dx / vec) * deceleration * dt;
-			dy -= (dy / vec) * deceleration * dt;
-		}
-		if(vec > maxSpeed) {
-			dx = (dx / vec) * maxSpeed;
-			dy = (dy / vec) * maxSpeed;
-		}
 		
 		// set position
 		x += dx * dt;
@@ -345,7 +337,9 @@ public class PlayerMP extends SpaceObject {
 		
 	}
 
-
+	public float lerp (float fromValue, float toValue, float progress) {
+		return (fromValue + (toValue - fromValue) * progress);
+	}
 	
 }
 

@@ -26,14 +26,9 @@ public class PlayState extends GameState {
 	private SpriteBatch sb;
 	private ShapeRenderer sr;
 
-	private boolean isShooting = false;
-
 	private BitmapFont font;
 	private Player hudPlayer;
-
-
-	private int ships = 0;
-
+	
 	public Player player;
 	private ArrayList<Bullet> bullets;
 	private ArrayList<Asteroid> asteroids;
@@ -41,8 +36,7 @@ public class PlayState extends GameState {
 	private ArrayList<FlyingSaucer> flyingSaucers;
 
 	private FlyingSaucer flyingSaucer;
-	private float fsTimer;
-	private float fsTime;
+
 
 	private ArrayList<Particle> particles;
 
@@ -95,8 +89,6 @@ public class PlayState extends GameState {
 
 		hudPlayer = new Player(null);
 
-		fsTimer = 0;
-		fsTime = 15;
 		enemyBullets = new ArrayList<Bullet>();
 
 		// set up bg music

@@ -108,11 +108,20 @@ public class SpaceObject {
 		}
 	}
 
+	public float lerp (float fromValue, float toValue, double progression) {
+		return (float)(fromValue + (toValue - fromValue) * progression);
+	}
+	
 	public boolean deathWrap()
 	{
 
 		return death;
 	}
+	public void dispose() {
+		this.dispose();
+	}
+	
+	
 
 }
 

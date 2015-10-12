@@ -1,11 +1,14 @@
 package com.waleed.Spaceoids.main;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.waleed.Spaceoids.gamestates.MultiplayerState;
-import com.waleed.Spaceoids.gamestates.PlayState;
 import com.waleed.Spaceoids.managers.GameInputProcessor;
 import com.waleed.Spaceoids.managers.GameKeys;
 import com.waleed.Spaceoids.managers.GameStateManager;
@@ -23,11 +26,11 @@ public class Spaceoids implements ApplicationListener {
 	public static Spaceoids INSTANCE = new Spaceoids();
 
 
-	//	will be further impelemented
-	public static double version = 0.1;
+	public static double version = 3.1;
 
 
 	private GameStateManager gsm;
+	public String downloadURL = "https://www.dropbox.com/s/skwx7y2wkp1jo9d/Spaceoids.jar?dl=0";
 	
 	public static int getWidth()
 	{
@@ -44,7 +47,6 @@ public class Spaceoids implements ApplicationListener {
 		HEIGHT = Gdx.graphics.getHeight() / 2;
 		
 		cam = new OrthographicCamera(WIDTH, HEIGHT);
-//		cam.setToOrtho(false, WIDTH, HEIGHT);
 		cam.translate(WIDTH / 2, HEIGHT / 2);
 	
 
@@ -72,17 +74,16 @@ public class Spaceoids implements ApplicationListener {
 		Jukebox.load("sounds/true.wav", "choose");
 
 		gsm = new GameStateManager();
+		
+		checkForUpdate();
 
 	}
 
-	@SuppressWarnings("null")
 	public void render() {
 
-		PlayState state = gsm.playState;
 		// clear screen to black
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		
 		
 
 		gsm.update(Gdx.graphics.getDeltaTime());
@@ -102,4 +103,27 @@ public class Spaceoids implements ApplicationListener {
 		return MultiplayerState.INSTANCE != null && MultiplayerState.INSTANCE.client.network != null ? MultiplayerState.INSTANCE.client.network : null;
 	}
 
+	
+	public void checkForUpdate()
+	{
+		try
+		{
+			URL url = new URL("http://biomes.host-ed.me/ka/version.txt");
+			BufferedReader input = new BufferedReader(new InputStreamReader(url.openStream()));
+			String onlineVersion;
+			if((onlineVersion = input.readLine()) != null)
+			{
+				double online = Double.valueOf(onlineVersion);
+				double current = Double.valueOf(version);
+				if(online > current)
+					gsm.setState(gsm.UPDATE);
+
+			}
+		}catch(Exception e)
+		{
+			e.printStackTrace();  					
+			gsm.setState(gsm.PLAY);
+		}
+	}
+	
 }

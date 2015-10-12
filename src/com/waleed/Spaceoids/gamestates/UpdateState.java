@@ -1,5 +1,9 @@
 package com.waleed.Spaceoids.gamestates;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -12,6 +16,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.waleed.Spaceoids.entities.Asteroid;
 import com.waleed.Spaceoids.main.Spaceoids;
+import com.waleed.Spaceoids.managers.Downloader;
 import com.waleed.Spaceoids.managers.GameKeys;
 import com.waleed.Spaceoids.managers.GameStateManager;
 import com.waleed.Spaceoids.managers.Jukebox;
@@ -34,9 +39,15 @@ public class UpdateState extends GameState{
 	private String[] menuItems;
 	
 	private ArrayList<Asteroid> asteroids;
+	
+	private Downloader downloader;
+	private Thread downloaderThread;
 
 	
-	protected UpdateState(GameStateManager gsm) {
+	private boolean error;
+
+	
+	public UpdateState(GameStateManager gsm) {
 		super(gsm);
 	}
 	
@@ -168,6 +179,12 @@ public class UpdateState extends GameState{
 	{
 		if(currentItem == 0)
 		{
+			try {
+				beginDownload(false);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}else if(currentItem == 1)
 		{
 			gsm.setState(GameStateManager.MENU);
@@ -176,10 +193,57 @@ public class UpdateState extends GameState{
 			Gdx.app.exit();
 		}
 	}
+	
+	private static boolean isDownloadAvaliable() {                                                                                                                                                                                                 
+		try {                                                                                                                                                                                                                                 
+			URL url = new URL(Spaceoids.INSTANCE.downloadURL);                                                                                                                                                                                 
+			URLConnection conn = url.openConnection();                                                                                                                                                                                  
+			conn.connect();
+			System.out.println("Download Server is stable");
+			return true;                                                                                                                                                                                                                      
+		} catch (MalformedURLException e) {  
+			String error = "Download Server is unstable" + e.toString();
+			System.err.println(error);
+			return false;
+		} catch (IOException e) {   
+			String error = "Download Server is unstable: " + e.toString();
+			System.err.println(error);
+			return false;                            
+		}                                                  
 
+	}    
+	
+
+
+
+	public void beginDownload(boolean isCancelled) throws InterruptedException
+	{
+		if(isDownloadAvaliable())
+		{
+			downloader = new Downloader();
+			boolean error = downloader.isError();
+			this.error = error;
+			if(isCancelled)
+			{
+
+				downloaderThread = new Thread(downloader);
+				downloaderThread.start();
+
+			}else
+			{         
+				downloaderThread = new Thread(downloader);
+				downloaderThread.start();
+
+			}
+		}
+	}
+
+	
 	@Override
 	public void dispose() {
 		
 	}
+	
+	
 
 }

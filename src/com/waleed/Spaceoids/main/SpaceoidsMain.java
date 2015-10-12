@@ -21,7 +21,6 @@ public class SpaceoidsMain {
 		cfg.resizable = true;
 		cfg.fullscreen = false;
 		new LwjglApplication(new Spaceoids(), cfg);
-		
 	}
 	
 }

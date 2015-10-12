@@ -1,6 +1,6 @@
 package com.waleed.Spaceoids.network.packets;
 
-public class PacketUpdatePosition {
+public class PacketUpdateDY {
 	public int id;
-	public float x, y;
+	public float dy;
 }

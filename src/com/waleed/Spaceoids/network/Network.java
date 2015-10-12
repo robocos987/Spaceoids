@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.graphics.Color;
+import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -14,15 +15,20 @@ import com.waleed.Spaceoids.gamestates.MultiplayerState;
 import com.waleed.Spaceoids.network.packets.MPPlayer;
 import com.waleed.Spaceoids.network.packets.PacketAddPlayer;
 import com.waleed.Spaceoids.network.packets.PacketAsteroids;
+import com.waleed.Spaceoids.network.packets.PacketChatMessage;
 import com.waleed.Spaceoids.network.packets.PacketRemovePlayer;
 import com.waleed.Spaceoids.network.packets.PacketUpdateAcceleration;
 import com.waleed.Spaceoids.network.packets.PacketUpdateBullet;
+import com.waleed.Spaceoids.network.packets.PacketUpdateDX;
+import com.waleed.Spaceoids.network.packets.PacketUpdateDY;
 import com.waleed.Spaceoids.network.packets.PacketUpdateDeath;
 import com.waleed.Spaceoids.network.packets.PacketUpdateFlames;
 import com.waleed.Spaceoids.network.packets.PacketUpdateHit;
 import com.waleed.Spaceoids.network.packets.PacketUpdatePosition;
 import com.waleed.Spaceoids.network.packets.PacketUpdateRotation;
 import com.waleed.Spaceoids.network.packets.PacketUpdateStats;
+import com.waleed.Spaceoids.network.packets.PacketUpdateX;
+import com.waleed.Spaceoids.network.packets.PacketUpdateY;
 import com.waleed.Spaceoids.network.packets.PacketWelcome;
 
 
@@ -42,23 +48,7 @@ public class Network extends Listener {
 		this.port = port;
 		this.player = player;
 		client = new Client();
-		client.getKryo().register(ArrayList.class);
-		client.getKryo().register(Bullet.class);
-		client.getKryo().register(float[].class);
-		client.getKryo().register(Color.class);
-		client.getKryo().register(PacketAddPlayer.class);	
-		client.getKryo().register(PacketAsteroids.class);
-		client.getKryo().register(PacketRemovePlayer.class);
-		client.getKryo().register(PacketUpdateAcceleration.class);
-		client.getKryo().register(PacketUpdateBullet.class);
-		client.getKryo().register(PacketUpdateDeath.class);
-		client.getKryo().register(PacketUpdateDeath.class);
-		client.getKryo().register(PacketUpdateFlames.class);
-		client.getKryo().register(PacketUpdateHit.class);
-		client.getKryo().register(PacketUpdatePosition.class);
-		client.getKryo().register(PacketUpdateRotation.class);
-		client.getKryo().register(PacketUpdateStats.class);
-		client.getKryo().register(PacketWelcome.class);
+		registerClasses(client.getKryo());
 		client.addListener(this);
 
 		client.start();
@@ -67,6 +57,32 @@ public class Network extends Listener {
 		} catch (IOException e) {
 			reason = e.toString();
 			e.printStackTrace();
+		}
+	}
+
+	private void registerClasses(Kryo kryo) {
+		kryo.register(ArrayList.class);
+		kryo.register(Bullet.class);
+		kryo.register(Color.class);
+		kryo.register(float[].class);
+		kryo.register(PacketAddPlayer.class);	
+		kryo.register(PacketAsteroids.class);
+		kryo.register(PacketChatMessage.class);
+		kryo.register(PacketUpdateAcceleration.class);
+		kryo.register(PacketUpdateBullet.class);
+		kryo.register(PacketUpdateDeath.class);
+		kryo.register(PacketUpdateFlames.class);
+		kryo.register(PacketUpdateHit.class);
+		kryo.register(PacketUpdatePosition.class);
+		kryo.register(PacketUpdateRotation.class);
+		kryo.register(PacketUpdateStats.class);
+		kryo.register(PacketRemovePlayer.class);
+		kryo.register(PacketWelcome.class);
+		kryo.register(PacketUpdateX.class);
+		kryo.register(PacketUpdateY.class);
+		for(int i = 0; i < kryo.getNextRegistrationId(); i++)
+		{
+			System.out.println("Registering: " + kryo.getRegistration(i).toString());
 		}
 	}
 
@@ -105,20 +121,18 @@ public class Network extends Listener {
 				reason = packet.reason;
 				this.kicked = true;
 			}
-			
+
 		}else if(o instanceof PacketUpdatePosition)
 		{
 			PacketUpdatePosition packet = (PacketUpdatePosition) o;
-			SpaceoidsClient.players.get(packet.id).x = packet.x;
-			SpaceoidsClient.players.get(packet.id).y = packet.y;
+			if(packet.id == this.player.id)
+			{
+				float x = packet.x - 20;
+				float y = packet.y;
+				
+				this.player.setPosition(x, y);
+			}
 
-			SpaceoidsClient.players.get(packet.id).dx = packet.dx;
-			SpaceoidsClient.players.get(packet.id).dy = packet.x;
-		}else if(o instanceof PacketUpdateAcceleration)
-		{
-			PacketUpdateAcceleration packet = (PacketUpdateAcceleration) o;
-			SpaceoidsClient.players.get(packet.id).acceleration = packet.accleration;
-			SpaceoidsClient.players.get(packet.id).acceleration = packet.acclerationTimer;
 		}else if(o instanceof PacketUpdateDeath)
 		{
 			PacketUpdateDeath packet = (PacketUpdateDeath) o;
@@ -154,6 +168,19 @@ public class Network extends Listener {
 		{
 			PacketAsteroids packet = (PacketAsteroids) o;
 			MultiplayerState.INSTANCE.asteroids = packet.asteroids;
+		}else if(o instanceof PacketChatMessage)
+		{
+			PacketChatMessage packet = (PacketChatMessage) o;
+			MultiplayerState.INSTANCE.message = packet.message;
+			MultiplayerState.INSTANCE.countDown = 7.0F;
+		}else if(o instanceof PacketUpdateX)
+		{
+			PacketUpdateX packet = (PacketUpdateX) o;
+			SpaceoidsClient.players.get(packet.id).setX(packet.x);
+		}else if(o instanceof PacketUpdateY)
+		{
+			PacketUpdateY packet = (PacketUpdateY) o;
+			SpaceoidsClient.players.get(packet.id).setY(packet.y);		
 		}
 
 		if(!(o.getClass().getCanonicalName().contains("UpdatePosition") || o.getClass().getCanonicalName().contains("UpdateAcceleration")
@@ -161,7 +188,7 @@ public class Network extends Listener {
 			System.out.println("Recieved: " + o.getClass().getCanonicalName());
 
 	}
-	
+
 	public String getReason()
 	{
 		return reason;

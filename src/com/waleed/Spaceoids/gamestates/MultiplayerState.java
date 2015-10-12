@@ -12,6 +12,7 @@ import java.util.List;
 
 
 
+
 import org.lwjgl.input.Keyboard;
 
 import com.badlogic.gdx.Gdx;
@@ -67,8 +68,12 @@ public class MultiplayerState extends GameState {
 
 	public int totalPlayers;
 	public boolean inGame;
-	
+
 	public boolean kicked;
+
+	public String message;
+	public float countDown = 7.0F;
+
 
 	public MultiplayerState(GameStateManager gsm) {
 		super(gsm);
@@ -76,6 +81,7 @@ public class MultiplayerState extends GameState {
 		INSTANCE = this;
 		hudPlayer = new Player(null);
 		kicked = false;
+		message = new String("");
 	}		
 
 	@Override
@@ -143,6 +149,11 @@ public class MultiplayerState extends GameState {
 				}
 			}
 
+			if(message != null)
+			{
+				countDown -= dt;
+			}
+
 			for(int i = 0; i < particles.size(); i++)
 			{
 				particles.get(i).update(dt);
@@ -164,16 +175,25 @@ public class MultiplayerState extends GameState {
 
 			if(you.isDead())
 			{
-				if(you.getLives() > 0)
+				/*if(you.getLives() > 0)
 				{
 					you.reset();
 					you.loseLife();
-				}
+				}*/
+				you.reset();
+				you.loseLife();
 			}
 
 			checkCollisions();
+		}else if(state == 1 || state == 2)
+		{
+			if(!client.players.isEmpty())
+			{
+				client.players.values().clear();
+			}
 		}
 	}
+
 
 
 
@@ -259,7 +279,7 @@ public class MultiplayerState extends GameState {
 		}else if(state == 2)
 		{
 			String message = "KICKED FOR \"" + client.network.getReason().toUpperCase() + "\"";
-			
+
 			sb.begin();
 			float width = lastNameFont.getBounds(message).width;
 			lastNameFont.draw(sb, 
@@ -271,7 +291,7 @@ public class MultiplayerState extends GameState {
 
 		}else if(state == 3)
 		{
-			totalPlayers = client.players.size();
+			totalPlayers = client.players.size() + 1;
 			for(MPPlayer mpPlayer: client.players.values())
 			{
 				PlayerMP player = mpPlayer.getPlayer();
@@ -318,7 +338,19 @@ public class MultiplayerState extends GameState {
 				idFont.draw(sb, "ID: " + player.getID(), player.getX() - 20, player.getY() + 10);
 			}
 
-			font.draw(sb, Long.toString(you.getScore()), 30, 80);
+			if(message != null && !message.isEmpty())
+			{
+				if(this.countDown > 3.0F)
+				{
+					font.setScale(.9f,.9f);
+					if(message.length() > 10)
+						font.draw(sb, "Server: " + message, (Spaceoids.WIDTH / 2) - 80, Spaceoids.HEIGHT / 2);
+					else
+						font.draw(sb, "Server: " + message, (Spaceoids.WIDTH / 2) - 30, Spaceoids.HEIGHT / 2);
+						
+				}
+			}
+			font.draw(sb, "Your score:" + Long.toString(you.getScore()), 30, 80);
 			font.draw(sb, "Your ID:  " + you.getID(), 30, 60);
 			font.draw(sb, "Players on server:" + totalPlayers, 30, 40);
 
@@ -328,7 +360,6 @@ public class MultiplayerState extends GameState {
 
 		}
 	}
-
 
 	public void checkCollisions()
 	{
@@ -352,7 +383,8 @@ public class MultiplayerState extends GameState {
 					player.hit();
 					System.out.println("Player crashed into a YOU");
 				}
-				
+
+
 				for(int i = 0; i < player.bullets.size(); i++)
 				{
 					if(player.bullets.get(i) != null)
@@ -366,11 +398,23 @@ public class MultiplayerState extends GameState {
 
 					} 
 				} 
+				
+				for(int i = 0; i < you.bullets.size(); i++)
+				{
+					if(you.bullets.get(i) != null)
+					{
+						if(player.contains(you.bullets.get(i).getX(), you.bullets.get(i).getY()))
+						{ 
+							player.hit();
+							Jukebox.play("explode");
+						}
+
+					} 
+				}
 			}
 		}
 
 	}
-
 
 	@Override
 	public void handleInput() {
@@ -388,6 +432,7 @@ public class MultiplayerState extends GameState {
 		if(state < 3 && GameKeys.isDown(GameKeys.ESCAPE))
 		{
 			gsm.setState(gsm.MENU);
+
 		}
 
 		if(state == 3)
@@ -404,13 +449,13 @@ public class MultiplayerState extends GameState {
 
 	@Override
 	public void dispose() {
-
 		sb.dispose();
 		sr.dispose();
 		font.dispose();
 		lastNameFont.dispose();
 		firstNameFont.dispose();
 	}
+
 
 
 }

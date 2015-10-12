@@ -7,6 +7,7 @@ import com.waleed.Spaceoids.gamestates.HighScoreState;
 import com.waleed.Spaceoids.gamestates.MenuState;
 import com.waleed.Spaceoids.gamestates.MultiplayerState;
 import com.waleed.Spaceoids.gamestates.PlayState;
+import com.waleed.Spaceoids.gamestates.UpdateState;
 
 public class GameStateManager {
 	
@@ -19,7 +20,9 @@ public class GameStateManager {
 	public static final int HIGHSCORE = 3847;
 	public static final int GAMEOVER = 928478;
 	public static final int MULTIPLAYER = 2269;
+	public static final int UPDATE = 1010;
 
+	
 	public static final int CHOOSEMODE = 2000;
 	
 //	public static String ip = "192.168.0.13";
@@ -55,6 +58,10 @@ public class GameStateManager {
 		if(state == CHOOSEMODE) {
 			gameState = new ChooseModeState(this);
 		}
+		
+		if(state == UPDATE) {
+			gameState = new UpdateState(this);
+		}
 		this.state = state;
 	}
 	
@@ -67,7 +74,6 @@ public class GameStateManager {
 	}
 
 	public boolean isSinglePlayer() {
-		// TODO Auto-generated method stub
 		return this.state == PLAY;
 	}
 	
