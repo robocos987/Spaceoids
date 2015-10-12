@@ -23,12 +23,16 @@ public class PlayerMP extends SpaceObject {
 	private boolean right;
 	public boolean up;
 	
+	//values sent from the server
+	public float netX, netY;
+	
 	private float maxSpeed;
 	public float acceleration;
 	public float deceleration;
 	public float acceleratingTimer;
 	public float dt;
-	
+
+
 	public boolean hit;
 	public boolean dead;
 	
@@ -280,9 +284,6 @@ public class PlayerMP extends SpaceObject {
 		x += dx * dt;
 		y += dy * dt;
 		
-		// set shape
-		setShape();
-		
 		// set flame
 		if(up) {
 			setFlame();
@@ -295,6 +296,10 @@ public class PlayerMP extends SpaceObject {
 	public void draw(ShapeRenderer sr) {
 		
 		sr.setColor(1, 500, 1, 10);
+		
+		// set shape
+		setShape();
+		
 		
 		sr.begin(ShapeType.Line);
 		

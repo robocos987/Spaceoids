@@ -194,6 +194,7 @@ public class MultiplayerState extends GameState {
 		}
 	}
 
+<<<<<<< HEAD
 
 
 
@@ -231,6 +232,8 @@ public class MultiplayerState extends GameState {
 
 
 
+=======
+>>>>>>> ed81f30c3fc7c0e5855b0d658362f9d8e9105660
 	@Override
 	public void draw() {
 		sb.setProjectionMatrix(Spaceoids.cam.combined);
