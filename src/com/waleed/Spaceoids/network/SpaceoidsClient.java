@@ -13,7 +13,7 @@ public class SpaceoidsClient extends Listener {
 	public Network network = new Network();
 
 	public SpaceoidsClient(String host, int port, Player player) {
-		network.connect("104.174.253.235", 911, 911 + 1, player);
+		network.connect("104.174.253.235", port, port + 1, player);
 	}
 
 	public boolean isConnected() {
