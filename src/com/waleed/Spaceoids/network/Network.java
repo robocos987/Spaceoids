@@ -125,7 +125,6 @@ public class Network extends Listener {
 		}else if(o instanceof PacketUpdatePosition)
 		{
 			PacketUpdatePosition packet = (PacketUpdatePosition) o;
-<<<<<<< HEAD
 			if(packet.id == this.player.id)
 			{
 				float x = packet.x - 20;
@@ -133,19 +132,13 @@ public class Network extends Listener {
 				
 				this.player.setPosition(x, y);
 			}
-
-=======
-			SpaceoidsClient.players.get(packet.id).netX = packet.x;
-			SpaceoidsClient.players.get(packet.id).netY = packet.y;
-
-			SpaceoidsClient.players.get(packet.id).dx = packet.dx;
-			SpaceoidsClient.players.get(packet.id).dy = packet.dy;
+			SpaceoidsClient.players.get(packet.id).position.set(packet.x, packet.y);
+			SpaceoidsClient.players.get(packet.id).speed.set(packet.dx, packet.dy);
 		}else if(o instanceof PacketUpdateAcceleration)
 		{
 			PacketUpdateAcceleration packet = (PacketUpdateAcceleration) o;
 			SpaceoidsClient.players.get(packet.id).acceleration = packet.accleration;
 			SpaceoidsClient.players.get(packet.id).acceleration = packet.acclerationTimer;
->>>>>>> ed81f30c3fc7c0e5855b0d658362f9d8e9105660
 		}else if(o instanceof PacketUpdateDeath)
 		{
 			PacketUpdateDeath packet = (PacketUpdateDeath) o;
