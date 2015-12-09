@@ -108,7 +108,7 @@ public class Network extends Listener {
 			packetStats.extraLives = this.player.getLives();
 			packetStats.score = this.player.getScore();
 
-			this.client.sendUDP(packetStats);
+			this.client.sendTCP(packetStats);
 
 		}else if(o instanceof PacketRemovePlayer)
 		{
@@ -134,11 +134,15 @@ public class Network extends Listener {
 			}
 			SpaceoidsClient.players.get(packet.id).position.set(packet.x, packet.y);
 			SpaceoidsClient.players.get(packet.id).speed.set(packet.dx, packet.dy);
+			SpaceoidsClient.players.get(packet.id).position.add(speed);
 		}else if(o instanceof PacketUpdateAcceleration)
 		{
 			PacketUpdateAcceleration packet = (PacketUpdateAcceleration) o;
-			SpaceoidsClient.players.get(packet.id).acceleration = packet.accleration;
-			SpaceoidsClient.players.get(packet.id).acceleration = packet.acclerationTimer;
+			if(packet.acceleration <= Player.MAX_SPEED)
+			{
+				SpaceoidsClient.players.get(packet.id).acceleration = packet.accleration;
+				SpaceoidsClient.players.get(packet.id).acceleration = packet.acclerationTimer;
+			}
 		}else if(o instanceof PacketUpdateDeath)
 		{
 			PacketUpdateDeath packet = (PacketUpdateDeath) o;
