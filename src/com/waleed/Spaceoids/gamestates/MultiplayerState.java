@@ -4,15 +4,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-
-
-
-
-
-
-
-
-
 import org.lwjgl.input.Keyboard;
 
 import com.badlogic.gdx.Gdx;
@@ -115,8 +106,6 @@ public class MultiplayerState extends GameState {
 		ip = GameStateManager.ip;
 		port = GameStateManager.port;
 
-
-
 	}
 
 	private void createParticles(float x, float y) {
@@ -193,13 +182,7 @@ public class MultiplayerState extends GameState {
 			}
 		}
 	}
-
-<<<<<<< HEAD
-
-
-
-
-
+	
 	public String getIP()
 	{		
 		String ipAddr = "";
@@ -231,9 +214,6 @@ public class MultiplayerState extends GameState {
 	}
 
 
-
-=======
->>>>>>> ed81f30c3fc7c0e5855b0d658362f9d8e9105660
 	@Override
 	public void draw() {
 		sb.setProjectionMatrix(Spaceoids.cam.combined);
@@ -242,19 +222,13 @@ public class MultiplayerState extends GameState {
 		if(client.isConnected())
 		{
 			if(inGame)
-			{
 				state = 3;
-			}else
-			{
+			else
 				state = 0;
-			}
 		}else if(client.isKicked())
-		{
 			state = 2;
-		}else
-		{
+		else
 			state = 1;
-		}
 
 
 		if(state == 0)
@@ -338,7 +312,7 @@ public class MultiplayerState extends GameState {
 			for(MPPlayer mpPlayer: client.players.values())
 			{
 				PlayerMP player = mpPlayer.getPlayer();
-				idFont.draw(sb, "ID: " + player.getID(), player.getX() - 20, player.getY() + 10);
+				idFont.draw(sb, "ID: " + player.getID(), player.getPosition().getX() - 20, player.getPosition().getY() + 10);
 			}
 
 			if(message != null && !message.isEmpty())
