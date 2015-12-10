@@ -8,8 +8,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.Vector2;
 import com.waleed.Spaceoids.main.Spaceoids;
 import com.waleed.Spaceoids.managers.Jukebox;
+
 
 public class PlayerMP extends SpaceObject {
 	
