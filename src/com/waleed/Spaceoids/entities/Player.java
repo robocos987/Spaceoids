@@ -86,6 +86,9 @@ public class Player extends SpaceObject {
 	public int id;
 
 	public static boolean remove = false;
+	
+	private Vector2 position;
+	private Vector2 speed;
 
 	public Player(ArrayList<Bullet> bullets) {
 
@@ -93,6 +96,9 @@ public class Player extends SpaceObject {
 
 		x = Spaceoids.WIDTH / 2;
 		y = Spaceoids.HEIGHT / 2;
+			
+		position = new Vector2(x, y);
+		speed = new Vector2(dx, dy);
 
 		maxSpeed = 300;
 		acceleration = 200;
@@ -323,8 +329,9 @@ public class Player extends SpaceObject {
 		}
 
 		// set position
-		x += dx * dt;
-		y += dy * dt;
+		speed.set(dx,dy);
+		speed.scl(-1.0f);
+		position.add(speed);
 
 		// set shape
 		setShape();
