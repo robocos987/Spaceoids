@@ -76,10 +76,9 @@ public class Network extends Listener {
 		kryo.register(PacketRemovePlayer.class);
 		kryo.register(PacketWelcome.class);
 		kryo.register(PacketUpdatePosition.class);
+		
 		for(int i = 0; i < kryo.getNextRegistrationId(); i++)
-		{
 			System.out.println("Registering: " + kryo.getRegistration(i).toString());
-		}
 	}
 
 	@Override
@@ -95,7 +94,6 @@ public class Network extends Listener {
 		{
 			PacketAddPlayer packet = (PacketAddPlayer) o;
 			PlayerMP newPlayer = new PlayerMP(packet.id, new ArrayList<Bullet>());
-			newPlayer.id = packet.id;
 			SpaceoidsClient.players.put(packet.id, newPlayer);
 
 			PacketUpdateStats packetStats = new PacketUpdateStats();
@@ -109,12 +107,10 @@ public class Network extends Listener {
 			PacketRemovePlayer packet = (PacketRemovePlayer) o;
 			if(packet.id != this.player.id)
 			{
-				SpaceoidsClient.players.remove(packet.id);
-			}else
-			{
 				reason = packet.reason;
 				this.setKicked(true);
-			}
+			}else
+				SpaceoidsClient.players.remove(packet.id);
 
 		}else if(o instanceof PacketUpdatePosition)
 		{
@@ -125,21 +121,23 @@ public class Network extends Listener {
 				float y = packet.y;
 
 				this.player.setPosition(x, y);
+			}else
+			{
+				PlayerMP mpPlayer = (PlayerMP) SpaceoidsClient.players.get(packet.id);
+				mpPlayer.ppx = mpPlayer.npx;
+				mpPlayer.ppdx = mpPlayer.npdx;
+				mpPlayer.ppy = mpPlayer.npy;
+				mpPlayer.ppdy = mpPlayer.npdy;
+				mpPlayer.ppr = mpPlayer.npr;
+				mpPlayer.ppdr = mpPlayer.npdr;
+				mpPlayer.cpd = 0;
+				mpPlayer.npx = packet.x;
+				mpPlayer.npdx = packet.dx;
+				mpPlayer.npy = packet.y;
+				mpPlayer.npdy = packet.dy;
+				mpPlayer.npr = packet.radians;
+				mpPlayer.npdr = packet.rotationSpeed;
 			}
-			PlayerMP mpPlayer = (PlayerMP) SpaceoidsClient.players.get(packet.id);
-			mpPlayer.ppx = mpPlayer.npx;
-			mpPlayer.ppdx = mpPlayer.npdx;
-			mpPlayer.ppy = mpPlayer.npy;
-			mpPlayer.ppdy = mpPlayer.npdy;
-			mpPlayer.ppr = mpPlayer.npr;
-			mpPlayer.ppdr = mpPlayer.npdr;
-			mpPlayer.cpd = 0;
-			mpPlayer.npx = packet.x;
-			mpPlayer.npdx = packet.dx;
-			mpPlayer.npy = packet.y;
-			mpPlayer.npdy = packet.dy;
-			mpPlayer.npr = packet.radians;
-			mpPlayer.npdr = packet.rotationSpeed;
 			
 		}else if(o instanceof PacketUpdateAcceleration)
 		{
