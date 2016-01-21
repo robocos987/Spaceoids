@@ -15,15 +15,12 @@ import com.waleed.Spaceoids.managers.Jukebox;
 import com.waleed.Spaceoids.network.Network;
 import com.waleed.Spaceoids.network.packets.PacketUpdateAcceleration;
 import com.waleed.Spaceoids.network.packets.PacketUpdateBullet;
-import com.waleed.Spaceoids.network.packets.PacketUpdateDX;
-import com.waleed.Spaceoids.network.packets.PacketUpdateDY;
 import com.waleed.Spaceoids.network.packets.PacketUpdateDeath;
 import com.waleed.Spaceoids.network.packets.PacketUpdateFlames;
 import com.waleed.Spaceoids.network.packets.PacketUpdateHit;
+import com.waleed.Spaceoids.network.packets.PacketUpdatePosition;
 import com.waleed.Spaceoids.network.packets.PacketUpdateRotation;
 import com.waleed.Spaceoids.network.packets.PacketUpdateStats;
-import com.waleed.Spaceoids.network.packets.PacketUpdateX;
-import com.waleed.Spaceoids.network.packets.PacketUpdateY;
 
 public class Player extends SpaceObject {
 
@@ -342,38 +339,29 @@ public class Player extends SpaceObject {
 	{
 		network = Spaceoids.getClient();
 
-		if(this.x != this.netX)
+		if(this.x != netX || this.y != netY || this.dx != netDX || this.dy != netDY)
 		{
-
-			PacketUpdateX packet = new PacketUpdateX();
-			packet.x = this.x;
-
+			PacketUpdatePosition packet = new PacketUpdatePosition();
+			packet.x = x;
+			packet.y = y;
+			packet.dx = dx;
+			packet.dy = dy;
 			network.client.sendUDP(packet);
-
+			
 			this.netX = x;
-		}
-
-		if(this.y != this.netY)
-		{
-
-			PacketUpdateY packet = new PacketUpdateY();
-			packet.y = this.y;
-
-			network.client.sendUDP(packet);
-
 			this.netY = y;
-
+			this.netDX = dx;
+			this.netDY = dy;
 		}
 
-		if(this.hit != this.networkHit || this.hitTimer != this.netHitTimer || this.hitTime != this.netHitTime
-				|| this.hitLines != this.nTL || this.hitLinesVector != this.nLV)
+		/*if(this.hit != this.networkHit || this.hitTimer != this.netHitTimer || this.hitTime != this.netHitTime)
 		{
 			PacketUpdateHit packet = new PacketUpdateHit();
 			packet.hit = this.hit;
 			packet.hitTimer = this.hitTimer;
 			packet.hitTime = this.hitTime;
-			packet.netHitLines = this.nTL;
-			packet.netHitLinesVec = this.nLV;
+			packet.netHitLines = this.hitLines;
+			packet.netHitLinesVec = this.hitLinesVector;
 
 			network.client.sendUDP(packet);
 			
@@ -381,7 +369,7 @@ public class Player extends SpaceObject {
 			this.netHitTimer = this.hitTimer;
 			this.netHitTime = this.hitTime;
 
-		}
+		}*/
 
 
 		if(this.dead != this.networkDead)

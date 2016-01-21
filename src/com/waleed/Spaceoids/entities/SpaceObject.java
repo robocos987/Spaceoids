@@ -4,17 +4,9 @@ import com.waleed.Spaceoids.main.Spaceoids;
 
 public class SpaceObject {
 
-	public float x;
-	public float y;
-
-	public float dx;
-	public float dy;
+	public float x, y, dx, dy, radians, speed, rotationSpeed, newX, newY, oldX, oldY;
 
 	public boolean death = true;
-
-	public float radians;
-	public float speed;
-	public float rotationSpeed;
 
 	protected boolean special;
 
@@ -45,11 +37,8 @@ public class SpaceObject {
 		{
 			for(int j = 0; j < sy.length; j++)
 			{
-//				System.out.println(sx[i]);
 				if(contains(sx[i], sy[j]))
-				{
 					return true;
-				}
 			}
 		}
 		return false;
@@ -108,10 +97,6 @@ public class SpaceObject {
 		}
 	}
 
-	public float lerp (float fromValue, float toValue, double progression) {
-		return (float)(fromValue + (toValue - fromValue) * progression);
-	}
-	
 	public boolean deathWrap()
 	{
 

@@ -12,23 +12,19 @@ import com.waleed.Spaceoids.entities.Bullet;
 import com.waleed.Spaceoids.entities.Player;
 import com.waleed.Spaceoids.entities.PlayerMP;
 import com.waleed.Spaceoids.gamestates.MultiplayerState;
-import com.waleed.Spaceoids.network.packets.MPPlayer;
+import com.waleed.Spaceoids.main.Spaceoids;
 import com.waleed.Spaceoids.network.packets.PacketAddPlayer;
 import com.waleed.Spaceoids.network.packets.PacketAsteroids;
 import com.waleed.Spaceoids.network.packets.PacketChatMessage;
 import com.waleed.Spaceoids.network.packets.PacketRemovePlayer;
 import com.waleed.Spaceoids.network.packets.PacketUpdateAcceleration;
 import com.waleed.Spaceoids.network.packets.PacketUpdateBullet;
-import com.waleed.Spaceoids.network.packets.PacketUpdateDX;
-import com.waleed.Spaceoids.network.packets.PacketUpdateDY;
 import com.waleed.Spaceoids.network.packets.PacketUpdateDeath;
 import com.waleed.Spaceoids.network.packets.PacketUpdateFlames;
 import com.waleed.Spaceoids.network.packets.PacketUpdateHit;
 import com.waleed.Spaceoids.network.packets.PacketUpdatePosition;
 import com.waleed.Spaceoids.network.packets.PacketUpdateRotation;
 import com.waleed.Spaceoids.network.packets.PacketUpdateStats;
-import com.waleed.Spaceoids.network.packets.PacketUpdateX;
-import com.waleed.Spaceoids.network.packets.PacketUpdateY;
 import com.waleed.Spaceoids.network.packets.PacketWelcome;
 
 
@@ -48,7 +44,7 @@ public class Network extends Listener {
 		this.port = port;
 		this.player = player;
 		client = new Client();
-		registerClasses(client.getKryo());
+		register(client.getKryo());
 		client.addListener(this);
 
 		client.start();
@@ -60,7 +56,7 @@ public class Network extends Listener {
 		}
 	}
 
-	private void registerClasses(Kryo kryo) {
+	public static void register(Kryo kryo) {
 		kryo.register(ArrayList.class);
 		kryo.register(Bullet.class);
 		kryo.register(Color.class);
@@ -70,6 +66,7 @@ public class Network extends Listener {
 		kryo.register(PacketChatMessage.class);
 		kryo.register(PacketUpdateAcceleration.class);
 		kryo.register(PacketUpdateBullet.class);
+
 		kryo.register(PacketUpdateDeath.class);
 		kryo.register(PacketUpdateFlames.class);
 		kryo.register(PacketUpdateHit.class);
@@ -78,8 +75,7 @@ public class Network extends Listener {
 		kryo.register(PacketUpdateStats.class);
 		kryo.register(PacketRemovePlayer.class);
 		kryo.register(PacketWelcome.class);
-		kryo.register(PacketUpdateX.class);
-		kryo.register(PacketUpdateY.class);
+		kryo.register(PacketUpdatePosition.class);
 		for(int i = 0; i < kryo.getNextRegistrationId(); i++)
 		{
 			System.out.println("Registering: " + kryo.getRegistration(i).toString());
@@ -98,10 +94,9 @@ public class Network extends Listener {
 		else if(o instanceof PacketAddPlayer)
 		{
 			PacketAddPlayer packet = (PacketAddPlayer) o;
-			MPPlayer newPlayer = new MPPlayer();
+			PlayerMP newPlayer = new PlayerMP(packet.id, Spaceoids.WIDTH / 2, Spaceoids.HEIGHT 
+					 / 2, new ArrayList<Bullet>());
 			newPlayer.id = packet.id;
-			PlayerMP playerMP = null;
-			newPlayer.setPlayer(playerMP, SpaceoidsClient.players.values().size() > 0);	
 			SpaceoidsClient.players.put(packet.id, newPlayer);
 
 			PacketUpdateStats packetStats = new PacketUpdateStats();
@@ -125,27 +120,14 @@ public class Network extends Listener {
 		}else if(o instanceof PacketUpdatePosition)
 		{
 			PacketUpdatePosition packet = (PacketUpdatePosition) o;
-<<<<<<< HEAD
 			if(packet.id == this.player.id)
 			{
 				float x = packet.x - 20;
 				float y = packet.y;
-				
+
 				this.player.setPosition(x, y);
 			}
 
-=======
-			SpaceoidsClient.players.get(packet.id).netX = packet.x;
-			SpaceoidsClient.players.get(packet.id).netY = packet.y;
-
-			SpaceoidsClient.players.get(packet.id).dx = packet.dx;
-			SpaceoidsClient.players.get(packet.id).dy = packet.dy;
-		}else if(o instanceof PacketUpdateAcceleration)
-		{
-			PacketUpdateAcceleration packet = (PacketUpdateAcceleration) o;
-			SpaceoidsClient.players.get(packet.id).acceleration = packet.accleration;
-			SpaceoidsClient.players.get(packet.id).acceleration = packet.acclerationTimer;
->>>>>>> ed81f30c3fc7c0e5855b0d658362f9d8e9105660
 		}else if(o instanceof PacketUpdateDeath)
 		{
 			PacketUpdateDeath packet = (PacketUpdateDeath) o;
@@ -156,8 +138,8 @@ public class Network extends Listener {
 			SpaceoidsClient.players.get(packet.id).hit = packet.hit;
 			SpaceoidsClient.players.get(packet.id).hitTime = packet.hitTime;
 			SpaceoidsClient.players.get(packet.id).hitTimer = packet.hitTimer;
-			SpaceoidsClient.players.get(packet.id).netHitLines = packet.netHitLines;
-			SpaceoidsClient.players.get(packet.id).netHitLinesVec = packet.netHitLinesVec;
+			SpaceoidsClient.players.get(packet.id).hitLines = packet.netHitLines;
+			SpaceoidsClient.players.get(packet.id).hitLinesVector = packet.netHitLinesVec;
 		}else if(o instanceof PacketUpdateRotation)
 		{
 			PacketUpdateRotation packet = (PacketUpdateRotation) o;
@@ -171,11 +153,14 @@ public class Network extends Listener {
 		{
 			PacketUpdateBullet packet = (PacketUpdateBullet) o;
 			SpaceoidsClient.players.get(packet.id).bullets = packet.bullet;
+			SpaceoidsClient.players.get(packet.id).newX = packet.bullet.get(0).x;
+			SpaceoidsClient.players.get(packet.id).newY = packet.bullet.get(0).y;
+			
 		}else if(o instanceof PacketUpdateStats)
 		{
 			PacketUpdateStats packet = (PacketUpdateStats) o;
 			SpaceoidsClient.players.get(packet.id).score = packet.score;
-			SpaceoidsClient.players.get(packet.id).lives = packet.extraLives;
+			SpaceoidsClient.players.get(packet.id).extraLives = packet.extraLives;
 
 		}else if(o instanceof PacketAsteroids)
 		{
@@ -184,19 +169,28 @@ public class Network extends Listener {
 		}else if(o instanceof PacketChatMessage)
 		{
 			PacketChatMessage packet = (PacketChatMessage) o;
-			MultiplayerState.INSTANCE.message = packet.message;
+//			MultiplayerState.INSTANCE.message = packet.message;
 			MultiplayerState.INSTANCE.countDown = 7.0F;
-		}else if(o instanceof PacketUpdateX)
+		}else if(o instanceof PacketUpdatePosition)
 		{
-			PacketUpdateX packet = (PacketUpdateX) o;
-			SpaceoidsClient.players.get(packet.id).setX(packet.x);
-		}else if(o instanceof PacketUpdateY)
+			PacketUpdatePosition packet = (PacketUpdatePosition) o;
+			SpaceoidsClient.players.get(packet.id).oldX = SpaceoidsClient.players.get(packet.id).x;
+			SpaceoidsClient.players.get(packet.id).oldY = SpaceoidsClient.players.get(packet.id).y;
+			SpaceoidsClient.players.get(packet.id).newX = packet.x;
+			SpaceoidsClient.players.get(packet.id).newY = packet.y;
+			SpaceoidsClient.players.get(packet.id).dx = packet.dx;
+			SpaceoidsClient.players.get(packet.id).dy = packet.dy;
+			
+
+		}else if(o instanceof PacketUpdateAcceleration)
 		{
-			PacketUpdateY packet = (PacketUpdateY) o;
-			SpaceoidsClient.players.get(packet.id).setY(packet.y);		
+			PacketUpdateAcceleration packet = (PacketUpdateAcceleration) o;
+			SpaceoidsClient.players.get(packet.id).acceleration = packet.accleration;
+			SpaceoidsClient.players.get(packet.id).acceleratingTimer = packet.acclerationTimer;
+
 		}
 
-		if(!(o.getClass().getCanonicalName().contains("UpdatePosition") || o.getClass().getCanonicalName().contains("UpdateAcceleration")
+		if(!(o.getClass().getCanonicalName().contains("UpdatePosition")
 				|| o.getClass().getCanonicalName().contains("UpdateHit")))
 			System.out.println("Recieved: " + o.getClass().getCanonicalName());
 

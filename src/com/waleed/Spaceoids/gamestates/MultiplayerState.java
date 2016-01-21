@@ -13,6 +13,7 @@ import java.util.List;
 
 
 
+
 import org.lwjgl.input.Keyboard;
 
 import com.badlogic.gdx.Gdx;
@@ -23,6 +24,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.jcraft.jogg.Packet;
 import com.waleed.Spaceoids.entities.Asteroid;
 import com.waleed.Spaceoids.entities.Bullet;
@@ -34,7 +36,6 @@ import com.waleed.Spaceoids.managers.GameKeys;
 import com.waleed.Spaceoids.managers.GameStateManager;
 import com.waleed.Spaceoids.managers.Jukebox;
 import com.waleed.Spaceoids.network.SpaceoidsClient;
-import com.waleed.Spaceoids.network.packets.MPPlayer;
 
 public class MultiplayerState extends GameState {
 
@@ -81,7 +82,6 @@ public class MultiplayerState extends GameState {
 		INSTANCE = this;
 		hudPlayer = new Player(null);
 		kicked = false;
-		message = new String("");
 	}		
 
 	@Override
@@ -92,7 +92,9 @@ public class MultiplayerState extends GameState {
 		particles = new ArrayList<Particle>();
 		asteroids = new ArrayList<Asteroid>();
 		you = new Player(yourBullets);
+		message = "";
 		client = new SpaceoidsClient(this.ip, this.port, you);
+		
 
 		FreeTypeFontGenerator gen = new FreeTypeFontGenerator(
 				Gdx.files.internal("fonts/Hyperspace Bold.ttf")
@@ -134,25 +136,22 @@ public class MultiplayerState extends GameState {
 		{
 			you.updateMP(dt);
 
-			for(MPPlayer mpPlayer: client.players.values())
+			for(PlayerMP mpPlayer: client.players.values())
 			{
-				PlayerMP player = mpPlayer.getPlayer();
-				player.update(dt);
-
+				mpPlayer.newCoords.set(mpPlayer.oldX, mpPlayer.oldY).lerp(new Vector2(mpPlayer.newX, mpPlayer.newY), dt);
+				mpPlayer.update(dt);
 				// update player bullets
-				for(int i = 0; i < player.bullets.size(); i++) {
-					player.bullets.get(i).update(dt);
-					if(player.bullets.get(i).shouldRemove()) {
-						player.bullets.remove(i);
+				for(int i = 0; i < mpPlayer.bullets.size(); i++) {
+					mpPlayer.bullets.get(i).update(dt);
+					if(mpPlayer.bullets.get(i).shouldRemove()) {
+						mpPlayer.bullets.remove(i);
 						i--;
 					}
 				}
 			}
 
-			if(message != null)
-			{
+			if(!message.contentEquals(""))
 				countDown -= dt;
-			}
 
 			for(int i = 0; i < particles.size(); i++)
 			{
@@ -194,7 +193,6 @@ public class MultiplayerState extends GameState {
 		}
 	}
 
-<<<<<<< HEAD
 
 
 
@@ -232,8 +230,6 @@ public class MultiplayerState extends GameState {
 
 
 
-=======
->>>>>>> ed81f30c3fc7c0e5855b0d658362f9d8e9105660
 	@Override
 	public void draw() {
 		sb.setProjectionMatrix(Spaceoids.cam.combined);
@@ -251,6 +247,7 @@ public class MultiplayerState extends GameState {
 		}else if(client.isKicked())
 		{
 			state = 2;
+			client.network.client.close();
 		}else
 		{
 			state = 1;
@@ -295,14 +292,13 @@ public class MultiplayerState extends GameState {
 		}else if(state == 3)
 		{
 			totalPlayers = client.players.size() + 1;
-			for(MPPlayer mpPlayer: client.players.values())
+			for(PlayerMP mpPlayer: client.players.values())
 			{
-				PlayerMP player = mpPlayer.getPlayer();
-				player.draw(sr);
+				mpPlayer.draw(sr);
 
-				for(int i = 0; i < player.bullets.size(); i++)
+				for(int i = 0; i < mpPlayer.bullets.size(); i++)
 				{
-					player.bullets.get(i).draw(sr);
+					mpPlayer.bullets.get(i).draw(sr);
 				}
 			}
 
@@ -335,10 +331,9 @@ public class MultiplayerState extends GameState {
 
 			idFont.draw(sb, "You", you.getX() - 20, you.getY() + 10);
 
-			for(MPPlayer mpPlayer: client.players.values())
+			for(PlayerMP mpPlayer: client.players.values())
 			{
-				PlayerMP player = mpPlayer.getPlayer();
-				idFont.draw(sb, "ID: " + player.getID(), player.getX() - 20, player.getY() + 10);
+				idFont.draw(sb, "ID: " + mpPlayer.getID(), mpPlayer.getX() - 20, mpPlayer.getY() + 10);
 			}
 
 			if(message != null && !message.isEmpty())
@@ -372,27 +367,26 @@ public class MultiplayerState extends GameState {
 			{
 				you.loseLife();
 			}
-			for(MPPlayer mpPlayer: client.players.values())
+			for(PlayerMP mpPlayer: client.players.values())
 			{
-				PlayerMP player = mpPlayer.getPlayer();
-				if(you.intersects(player))
+				if(you.intersects(mpPlayer))
 				{
 					you.hit();
 					you.decreaseScore(20);
 					System.out.println("Crashed into a player");
 				}
-				if(player.intersects(you))
+				if(mpPlayer.intersects(you))
 				{
-					player.hit();
+					mpPlayer.hit();
 					System.out.println("Player crashed into a YOU");
 				}
 
 
-				for(int i = 0; i < player.bullets.size(); i++)
+				for(int i = 0; i < mpPlayer.bullets.size(); i++)
 				{
-					if(player.bullets.get(i) != null)
+					if(mpPlayer.bullets.get(i) != null)
 					{
-						if(you.contains(player.bullets.get(i).getX(), player.bullets.get(i).getY()))
+						if(you.contains(mpPlayer.bullets.get(i).getX(), mpPlayer.bullets.get(i).getY()))
 						{ 
 							you.hit();
 							you.decreaseScore(30);						
@@ -406,9 +400,9 @@ public class MultiplayerState extends GameState {
 				{
 					if(you.bullets.get(i) != null)
 					{
-						if(player.contains(you.bullets.get(i).getX(), you.bullets.get(i).getY()))
+						if(mpPlayer.contains(you.bullets.get(i).getX(), you.bullets.get(i).getY()))
 						{ 
-							player.hit();
+							mpPlayer.hit();
 							Jukebox.play("explode");
 						}
 

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.esotericsoftware.kryonet.Connection;
 import com.waleed.Spaceoids.entities.Bullet;
 import com.waleed.Spaceoids.entities.Player;
+import com.waleed.Spaceoids.entities.PlayerMP;
 import com.waleed.Spaceoids.main.Spaceoids;
 
 
@@ -16,7 +17,7 @@ public class ConnectedPlayer {
 	public float dx;
 	public float dy;
 	public float acceleration;
-	public float accelerationTimer;
+	public float acclerationTimer;
 	public boolean death;
 	public boolean hit;
 	public float hitTimer;

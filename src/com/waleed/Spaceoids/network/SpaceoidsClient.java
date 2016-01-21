@@ -5,11 +5,10 @@ import java.util.Map;
 
 import com.esotericsoftware.kryonet.Listener;
 import com.waleed.Spaceoids.entities.Player;
-import com.waleed.Spaceoids.gamestates.MultiplayerState;
-import com.waleed.Spaceoids.network.packets.MPPlayer;
+import com.waleed.Spaceoids.entities.PlayerMP;
 
 public class SpaceoidsClient extends Listener {
-	public static Map<Integer, MPPlayer> players = new HashMap<Integer, MPPlayer>();
+	public static Map<Integer, PlayerMP> players = new HashMap<Integer, PlayerMP>();
 	public Network network = new Network();
 
 	public SpaceoidsClient(String host, int port, Player player) {

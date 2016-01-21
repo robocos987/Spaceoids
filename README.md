@@ -1,1 +1,0 @@
-Spaceshooter written in LibGDX

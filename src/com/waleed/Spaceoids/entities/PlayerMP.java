@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.waleed.Spaceoids.main.Spaceoids;
 import com.waleed.Spaceoids.managers.Jukebox;
 
@@ -23,16 +24,12 @@ public class PlayerMP extends SpaceObject {
 	private boolean right;
 	public boolean up;
 	
-	//values sent from the server
-	public float netX, netY;
-	
 	private float maxSpeed;
 	public float acceleration;
 	public float deceleration;
 	public float acceleratingTimer;
 	public float dt;
-
-
+	
 	public boolean hit;
 	public boolean dead;
 	
@@ -49,13 +46,9 @@ public class PlayerMP extends SpaceObject {
 	private long requiredScore;
 	
 	public boolean deathWrap = false;
-	
-
-	
 	public static boolean remove = false;
-	
 	public int id;
-	public float ping;
+	public Vector2 newCoords;
 		
 	public PlayerMP(int id, float x, float y, ArrayList<Bullet> bullets) {
 		
@@ -64,11 +57,10 @@ public class PlayerMP extends SpaceObject {
 		
 		this.id = id;
 		
-		x = Spaceoids.WIDTH / 2;
-		y = Spaceoids.HEIGHT / 2;
-		
 		this.x = x;
 		this.y = y;
+		
+		this.newCoords = new Vector2(x, y);
 		
 		maxSpeed = 300;
 		acceleration = 200;
@@ -119,6 +111,8 @@ public class PlayerMP extends SpaceObject {
 	}
 
 	
+	
+
 	public int getID()
 	{
 		return id;
@@ -241,7 +235,7 @@ public class PlayerMP extends SpaceObject {
 				dead = true;
 				hitTimer = 0;
 			}
-			for(int i = 0; i < hitLines.length; i++) {
+			/*for(int i = 0; i < hitLines.length; i++) {
 				hitLines[i].setLine(
 					hitLines[i].x1 + hitLinesVector[i].x * 10 * dt,
 					hitLines[i].y1 + hitLinesVector[i].y * 10 * dt,
@@ -249,6 +243,7 @@ public class PlayerMP extends SpaceObject {
 					hitLines[i].y2 + hitLinesVector[i].y * 10 * dt
 				);
 			}
+			*/
 			return;
 		}
 		
@@ -281,8 +276,10 @@ public class PlayerMP extends SpaceObject {
 		
 		
 		// set position
-		x += dx * dt;
-		y += dy * dt;
+		this.x += dx * dt;
+		this.y += dy * dt;
+		// set shape
+		setShape();
 		
 		// set flame
 		if(up) {
@@ -297,22 +294,18 @@ public class PlayerMP extends SpaceObject {
 		
 		sr.setColor(1, 500, 1, 10);
 		
-		// set shape
-		setShape();
-		
-		
 		sr.begin(ShapeType.Line);
 		
 		// check if hit
 		if(hit) {
-			for(int i = 0; i < hitLines.length; i++) {
+			/*for(int i = 0; i < hitLines.length; i++) {
 				sr.line(
 					hitLines[i].x1,
 					hitLines[i].y1,
 					hitLines[i].x2,
 					hitLines[i].y2
 				);
-			}
+			}*/
 			sr.end();
 			return;
 		}
@@ -341,11 +334,6 @@ public class PlayerMP extends SpaceObject {
 		sr.end();
 		
 	}
-
-	public float lerp (float fromValue, float toValue, float progress) {
-		return (fromValue + (toValue - fromValue) * progress);
-	}
-	
 }
 
 
