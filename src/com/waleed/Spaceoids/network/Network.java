@@ -126,15 +126,21 @@ public class Network extends Listener {
 
 				this.player.setPosition(x, y);
 			}
-			SpaceoidsClient.players.get(packet.id).oldX = SpaceoidsClient.players.get(packet.id).x;
-			SpaceoidsClient.players.get(packet.id).oldY = SpaceoidsClient.players.get(packet.id).y;
-
-			SpaceoidsClient.players.get(packet.id).newX = packet.x;
-			SpaceoidsClient.players.get(packet.id).newY = packet.y;
-			SpaceoidsClient.players.get(packet.id).dx = packet.dx;
-			SpaceoidsClient.players.get(packet.id).dy = packet.dy;
-
-
+			PlayerMP mpPlayer = (PlayerMP) SpaceoidsClient.players.get(packet.id);
+			mpPlayer.ppx = mpPlayer.npx;
+			mpPlayer.ppdx = mpPlayer.npdx;
+			mpPlayer.ppy = mpPlayer.npy;
+			mpPlayer.ppdy = mpPlayer.npdy;
+			mpPlayer.ppr = mpPlayer.npr;
+			mpPlayer.ppdr = mpPlayer.npdr;
+			mpPlayer.cdx = 0;
+			mpPlayer.npx = packet.x;
+			mpPlayer.npdx = packet.dx;
+			mpPlayer.npy = packet.y;
+			mpPlayer.npdy = packet.dy;
+			mpPlayer.npr = packet.radians;
+			mpPlayer.npdr = packet.rotationSpeed;
+			
 		}else if(o instanceof PacketUpdateAcceleration)
 		{
 			PacketUpdateAcceleration packet = (PacketUpdateAcceleration) o;
@@ -153,11 +159,7 @@ public class Network extends Listener {
 			SpaceoidsClient.players.get(packet.id).hitTimer = packet.hitTimer;
 			SpaceoidsClient.players.get(packet.id).hitLines = packet.netHitLines;
 			SpaceoidsClient.players.get(packet.id).hitLinesVector = packet.netHitLinesVec;
-		}else if(o instanceof PacketUpdateRotation)
-		{
-			PacketUpdateRotation packet = (PacketUpdateRotation) o;
-			SpaceoidsClient.players.get(packet.id).radians = packet.radians;
-			SpaceoidsClient.players.get(packet.id).rotationSpeed = packet.rotationSpeed;
+		}
 		}else if(o instanceof PacketUpdateFlames)
 		{
 			PacketUpdateFlames packet = (PacketUpdateFlames) o;
