@@ -118,7 +118,8 @@ public class MultiplayerState extends GameState {
 
 			for(PlayerMP mpPlayer: client.players.values())
 			{
-				mpPlayer.newCoords.set(mpPlayer.oldX, mpPlayer.oldY).lerp(new Vector2(mpPlayer.newX, mpPlayer.newY), dt);
+				//mpPlayer.newCoords.set(mpPlayer.oldX, mpPlayer.oldY).lerp(new Vector2(mpPlayer.newX, mpPlayer.newY), dt);
+				
 				mpPlayer.update(dt);
 				// update player bullets
 				for(int i = 0; i < mpPlayer.bullets.size(); i++) {
