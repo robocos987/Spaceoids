@@ -80,13 +80,10 @@ public class Player extends SpaceObject {
 	private boolean networkUp;
 
 	public boolean hasShot;
-	private int id;
+	public int id;
 
 	public static boolean remove = false;
 	
-	private Vector2 position;
-	private Vector2 speed;
-
 	public Player(ArrayList<Bullet> bullets) {
 
 		this.bullets = bullets;
@@ -94,8 +91,6 @@ public class Player extends SpaceObject {
 		x = Spaceoids.WIDTH / 2;
 		y = Spaceoids.HEIGHT / 2;
 			
-		position = new Vector2(x, y);
-		speed = new Vector2(dx, dy);
 
 		maxSpeed = 300;
 		acceleration = 200;
@@ -190,7 +185,6 @@ public class Player extends SpaceObject {
 
 	public void setPosition(float x, float y) {
 		super.setPosition(x, y);
-		this.position.set(x, y);
 		setShape();
 	}
 
@@ -203,25 +197,10 @@ public class Player extends SpaceObject {
 		hit = dead = false;
 	}
 	
-	public float getX()
-	{
-		return this.positon.getX();
-	}
-	
-	public float getDX()
-	{
-		return this.speed.getX();
-	}
-	
-	public float getY()
-	{
-		return this.positon.getY();
-	}
-	
-	public float getDY()
-	{
-		return this.speed.getY();
-	}
+	public float getX() { return this.x; }
+	public float getY() { return this.y; }
+	public float getDX() { return this.dx; }
+	public float getDY() { return this.dy; }
 
 	public long getScore() { return score; }
 	public int getLives() { return extraLives; }
@@ -345,10 +324,8 @@ public class Player extends SpaceObject {
 			dy = (dy / vec) * maxSpeed;
 		}
 
-		// set position
-		this.position.add(speed.x * dt, speed.y * dt);
-		this.speed.scl(1 - (0.98f * dt)); // Linear dampening, otherwise the ball will keep going at the original velocity forever
-
+		this.x += dx * dt;
+		this.y += dy * dt;
 		// set shape
 		setShape();
 

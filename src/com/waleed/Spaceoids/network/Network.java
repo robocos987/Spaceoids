@@ -94,8 +94,7 @@ public class Network extends Listener {
 		else if(o instanceof PacketAddPlayer)
 		{
 			PacketAddPlayer packet = (PacketAddPlayer) o;
-			PlayerMP newPlayer = new PlayerMP(packet.id, Spaceoids.WIDTH / 2, Spaceoids.HEIGHT 
-					 / 2, new ArrayList<Bullet>());
+			PlayerMP newPlayer = new PlayerMP(packet.id, new ArrayList<Bullet>());
 			newPlayer.id = packet.id;
 			SpaceoidsClient.players.put(packet.id, newPlayer);
 
@@ -127,21 +126,21 @@ public class Network extends Listener {
 
 				this.player.setPosition(x, y);
 			}
-<<<<<<< HEAD
+			SpaceoidsClient.players.get(packet.id).oldX = SpaceoidsClient.players.get(packet.id).x;
+			SpaceoidsClient.players.get(packet.id).oldY = SpaceoidsClient.players.get(packet.id).y;
 
-=======
-			SpaceoidsClient.players.get(packet.id).position.set(packet.x, packet.y);
-			SpaceoidsClient.players.get(packet.id).speed.set(packet.dx, packet.dy);
-			SpaceoidsClient.players.get(packet.id).position.add(speed);
+			SpaceoidsClient.players.get(packet.id).newX = packet.x;
+			SpaceoidsClient.players.get(packet.id).newY = packet.y;
+			SpaceoidsClient.players.get(packet.id).dx = packet.dx;
+			SpaceoidsClient.players.get(packet.id).dy = packet.dy;
+
+
 		}else if(o instanceof PacketUpdateAcceleration)
 		{
 			PacketUpdateAcceleration packet = (PacketUpdateAcceleration) o;
-			if(packet.acceleration <= Player.MAX_SPEED)
-			{
-				SpaceoidsClient.players.get(packet.id).acceleration = packet.accleration;
-				SpaceoidsClient.players.get(packet.id).acceleration = packet.acclerationTimer;
-			}
->>>>>>> 159ab51240f8f38f3da39c687e88453230c28936
+			SpaceoidsClient.players.get(packet.id).acceleration = packet.accleration;
+			SpaceoidsClient.players.get(packet.id).acceleration = packet.acclerationTimer;
+
 		}else if(o instanceof PacketUpdateDeath)
 		{
 			PacketUpdateDeath packet = (PacketUpdateDeath) o;
