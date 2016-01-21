@@ -6,7 +6,7 @@ import java.net.URL;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.waleed.Spaceoids.gamestates.MultiplayerState;
 import com.waleed.Spaceoids.managers.GameInputProcessor;
@@ -83,7 +83,7 @@ public class Spaceoids implements ApplicationListener {
 
 		// clear screen to black
 		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 
 		gsm.update(Gdx.graphics.getDeltaTime());

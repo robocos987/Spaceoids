@@ -161,7 +161,6 @@ public class MultiplayerState extends GameState {
 					player.loseLife();
 				}*/
 				player.reset();
-				player.loseLife();
 			}
 
 			checkCollisions();

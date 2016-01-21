@@ -30,8 +30,7 @@ public class Bullet extends SpaceObject {
 		this.x = x;
 		this.y = y;
 		this.radians = radians;
-		Random rand = new Random();
-		float speed = rand.nextInt(10) == 2 ? 100 : 300;
+		float speed = 300;
 		dx = MathUtils.cos(radians) * speed;
 		dy = MathUtils.sin(radians) * speed;
 
@@ -47,7 +46,6 @@ public class Bullet extends SpaceObject {
 
 		x += dx * dt;
 		y += dy * dt;
-
 	
 		lifeTimer += dt;
 		if(lifeTimer > lifeTime) {
@@ -58,7 +56,7 @@ public class Bullet extends SpaceObject {
 
 	public void draw(ShapeRenderer sr) {
 		sr.setColor(color);
-		sr.begin(ShapeType.Circle);
+		sr.begin(ShapeType.Filled);
 		sr.circle(x - width / 2, y - height / 2, width / 2);
 		sr.end();
 	}

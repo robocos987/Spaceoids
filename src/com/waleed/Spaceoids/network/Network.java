@@ -133,7 +133,7 @@ public class Network extends Listener {
 			mpPlayer.ppdy = mpPlayer.npdy;
 			mpPlayer.ppr = mpPlayer.npr;
 			mpPlayer.ppdr = mpPlayer.npdr;
-			mpPlayer.cdx = 0;
+			mpPlayer.cpd = 0;
 			mpPlayer.npx = packet.x;
 			mpPlayer.npdx = packet.dx;
 			mpPlayer.npy = packet.y;
@@ -159,7 +159,6 @@ public class Network extends Listener {
 			SpaceoidsClient.players.get(packet.id).hitTimer = packet.hitTimer;
 			SpaceoidsClient.players.get(packet.id).hitLines = packet.netHitLines;
 			SpaceoidsClient.players.get(packet.id).hitLinesVector = packet.netHitLinesVec;
-		}
 		}else if(o instanceof PacketUpdateFlames)
 		{
 			PacketUpdateFlames packet = (PacketUpdateFlames) o;

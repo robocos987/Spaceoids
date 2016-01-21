@@ -17,7 +17,6 @@ public class SpaceoidsMain {
 		cfg.title = "Spaceoids";
 		cfg.width = (int)width;
 		cfg.height = (int)height;
-		cfg.useGL20 = true;
 		cfg.resizable = true;
 		cfg.fullscreen = false;
 		new LwjglApplication(new Spaceoids(), cfg);

@@ -42,7 +42,7 @@ public class Particle extends SpaceObject {
 	
 	public void draw(ShapeRenderer sr) {
 		sr.setColor(1, 1, 1, 1);
-		sr.begin(ShapeType.Circle);
+		sr.begin(ShapeType.Filled);
 		sr.circle(x - width / 2,  y - width / 2, width / 2);
 		sr.end();
 	}
