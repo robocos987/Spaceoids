@@ -288,7 +288,7 @@ public class PlayerMP extends SpaceObject {
 		}
 		
 		cpd += dt;
-		float delta = cpd * 6.0; //This should be right, but if you notice small halts in movement, try tweaking the six to a different value.
+		float delta = min(cpd * 6.0, 1.0); //This should be right, but if you notice small halts in movement, try tweaking the six to a different value.
 		this.x       = lerp(ppx+ppdx*delta,npx-npdx*delta,delta);
 		this.y       = lerp(ppy+ppdy*delta,npy-npdy*delta,delta);
 		this.radians = lerp(ppr+ppdr*delta,npr-npdr*delta,delta); //approximate quadratic bezier interpolation
@@ -303,6 +303,11 @@ public class PlayerMP extends SpaceObject {
 		
 		// screen wrap
 		wrap();
+	}
+	
+	public float min(float a, float b)
+	{
+		return a > b ? a : b;
 	}
 	
 	public float lerp(float a, float b, float x)
