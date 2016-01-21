@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.lwjgl.input.Keyboard;
 
 import com.badlogic.gdx.Gdx;
@@ -25,16 +26,17 @@ import com.waleed.Spaceoids.main.Spaceoids;
 import com.waleed.Spaceoids.managers.GameKeys;
 import com.waleed.Spaceoids.managers.GameStateManager;
 import com.waleed.Spaceoids.managers.Jukebox;
+import com.waleed.Spaceoids.network.Network;
 import com.waleed.Spaceoids.network.SpaceoidsClient;
 
 public class MultiplayerState extends GameState {
 
-	private GameStateManager gsm;
+	public static SpaceoidsClient client;
 
-	public SpriteBatch sb;
+	private SpriteBatch sb;
+	private GameStateManager gsm;
 	private ShapeRenderer sr;
 
-	public SpaceoidsClient client;
 
 	private BitmapFont titleFont;
 	private BitmapFont font;
@@ -42,34 +44,27 @@ public class MultiplayerState extends GameState {
 	private BitmapFont firstNameFont;
 	private BitmapFont lastNameFont;
 
-	public static int state = -1;
+	private int state = -1;
 	private Player hudPlayer;
 
-	private ArrayList<Bullet> yourBullets;
+	private ArrayList<Bullet> playerrBullets;
 	private ArrayList<Particle> particles;
-	public  ArrayList<Asteroid> asteroids;
+	private  ArrayList<Asteroid> asteroids;
 
+	private Player player;
 
-	public static MultiplayerState INSTANCE;
+	private int totalPlayers;
+	private boolean inGame;
 
-	private Player you;
+	private boolean kicked;
 
-	private String ip;
-	int port;
-
-	public int totalPlayers;
-	public boolean inGame;
-
-	public boolean kicked;
-
-	public String message;
-	public float countDown = 7.0F;
+	private String message;
+	private float countDown = 7.0F;
 
 
 	public MultiplayerState(GameStateManager gsm) {
 		super(gsm);
 		this.gsm = gsm;
-		INSTANCE = this;
 		hudPlayer = new Player(null);
 		kicked = false;
 	}		
@@ -78,12 +73,12 @@ public class MultiplayerState extends GameState {
 	public void init() {
 		sb = new SpriteBatch();
 		sr = new ShapeRenderer();
-		yourBullets = new ArrayList<Bullet>();
+		playerrBullets = new ArrayList<Bullet>();
 		particles = new ArrayList<Particle>();
 		asteroids = new ArrayList<Asteroid>();
-		you = new Player(yourBullets);
+		player = new Player(playerrBullets);
 		message = "";
-		client = new SpaceoidsClient(this.ip, this.port, you);
+		client = new SpaceoidsClient(GameStateManager.ip, GameStateManager.port, player);
 		
 
 		FreeTypeFontGenerator gen = new FreeTypeFontGenerator(
@@ -104,9 +99,6 @@ public class MultiplayerState extends GameState {
 		lastNameFont = gen.generateFont(40);
 		lastNameFont.setColor(Color.RED);
 
-		ip = GameStateManager.ip;
-		port = GameStateManager.port;
-
 	}
 
 	private void createParticles(float x, float y) {
@@ -122,7 +114,7 @@ public class MultiplayerState extends GameState {
 
 		if(state == 3)
 		{
-			you.updateMP(dt);
+			player.updateMP(dt);
 
 			for(PlayerMP mpPlayer: client.players.values())
 			{
@@ -147,10 +139,10 @@ public class MultiplayerState extends GameState {
 			}
 
 			// update my bullets
-			for(int i = 0; i < you.bullets.size(); i++) {
-				you.bullets.get(i).update(dt);
-				if(you.bullets.get(i).shouldRemove()) {
-					you.bullets.remove(i);
+			for(int i = 0; i < player.getBullets().size(); i++) {
+				player.getBullets().get(i).update(dt);
+				if(player.getBullets().get(i).shouldRemove()) {
+					player.getBullets().remove(i);
 					i--;
 				}
 			}
@@ -160,15 +152,15 @@ public class MultiplayerState extends GameState {
 				asteroids.get(i).update(dt);
 			}
 
-			if(you.isDead())
+			if(player.isDead())
 			{
-				/*if(you.getLives() > 0)
+				/*if(player.getLives() > 0)
 				{
-					you.reset();
-					you.loseLife();
+					player.reset();
+					player.loseLife();
 				}*/
-				you.reset();
-				you.loseLife();
+				player.reset();
+				player.loseLife();
 			}
 
 			checkCollisions();
@@ -225,17 +217,17 @@ public class MultiplayerState extends GameState {
 		}else if(client.isKicked())
 		{
 			state = 2;
-			client.network.client.close();
+			client.network.getClient().close();
 		}else
 			state = 1;
 	
 		if(state == 0)
 		{
 			sb.begin();
-			float width = titleFont.getBounds("Connected to: " + ip).width;
+			float width = titleFont.getBounds("Connected to: " + GameStateManager.ip).width;
 			titleFont.draw(
 					sb,
-					"Connected to: " + ip ,
+					"Connected to: " + GameStateManager.ip ,
 					(Spaceoids.WIDTH - width) / 2,
 					300
 					);	
@@ -278,8 +270,8 @@ public class MultiplayerState extends GameState {
 			}
 
 			// draw bullets
-			for(int i = 0; i < you.bullets.size(); i++) {
-				you.bullets.get(i).draw(sr);
+			for(int i = 0; i < player.getBullets().size(); i++) {
+				player.getBullets().get(i).draw(sr);
 			}
 
 			// draw particles
@@ -293,10 +285,10 @@ public class MultiplayerState extends GameState {
 				asteroids.get(i).draw(sr);
 			}
 
-			you.draw(sr);
+			player.draw(sr);
 
 			// draw lives
-			for(int i = 0; i < you.getLives(); i++) {
+			for(int i = 0; i < player.getLives(); i++) {
 				hudPlayer.setPosition(600 + i * 10, 60);
 				hudPlayer.draw(sr);
 			}
@@ -304,7 +296,7 @@ public class MultiplayerState extends GameState {
 			sb.setColor(1, 1, 1, 1);
 			sb.begin();
 
-			idFont.draw(sb, "You", you.getX() - 20, you.getY() + 10);
+			idFont.draw(sb, "player", player.getX() - 20, player.getY() + 10);
 
 			for(PlayerMP mpPlayer: client.players.values())
 			{
@@ -323,8 +315,8 @@ public class MultiplayerState extends GameState {
 						
 				}
 			}
-			font.draw(sb, "Your score:" + Long.toString(you.getScore()), 30, 80);
-			font.draw(sb, "Your ID:  " + you.getID(), 30, 60);
+			font.draw(sb, "playerr score:" + Long.toString(player.getScore()), 30, 80);
+			font.draw(sb, "playerr ID:  " + player.getID(), 30, 60);
 			font.draw(sb, "Players on server:" + totalPlayers, 30, 40);
 
 
@@ -337,23 +329,23 @@ public class MultiplayerState extends GameState {
 	public void checkCollisions()
 	{
 		// player-player collision
-		if(!you.isHit()) {
-			if(you.deathWrap)
+		if(!player.isHit()) {
+			if(player.deathWrap)
 			{
-				you.loseLife();
+				player.loseLife();
 			}
 			for(PlayerMP mpPlayer: client.players.values())
 			{
-				if(you.intersects(mpPlayer))
+				if(player.intersects(mpPlayer))
 				{
-					you.hit();
-					you.decreaseScore(20);
+					player.hit();
+					player.decreaseScore(20);
 					System.out.println("Crashed into a player");
 				}
-				if(mpPlayer.intersects(you))
+				if(mpPlayer.intersects(player))
 				{
 					mpPlayer.hit();
-					System.out.println("Player crashed into a YOU");
+					System.out.println("Player crashed into a player");
 				}
 
 
@@ -361,21 +353,21 @@ public class MultiplayerState extends GameState {
 				{
 					if(mpPlayer.bullets.get(i) != null)
 					{
-						if(you.contains(mpPlayer.bullets.get(i).getX(), mpPlayer.bullets.get(i).getY()))
+						if(player.contains(mpPlayer.bullets.get(i).getX(), mpPlayer.bullets.get(i).getY()))
 						{ 
-							you.hit();
-							you.decreaseScore(30);						
+							player.hit();
+							player.decreaseScore(30);						
 							Jukebox.play("explode");
 						}
 
 					} 
 				} 
 				
-				for(int i = 0; i < you.bullets.size(); i++)
+				for(int i = 0; i < player.getBullets().size(); i++)
 				{
-					if(you.bullets.get(i) != null)
+					if(player.getBullets().get(i) != null)
 					{
-						if(mpPlayer.contains(you.bullets.get(i).getX(), you.bullets.get(i).getY()))
+						if(mpPlayer.contains(player.getBullets().get(i).getX(), player.getBullets().get(i).getY()))
 						{ 
 							mpPlayer.hit();
 							Jukebox.play("explode");
@@ -396,7 +388,7 @@ public class MultiplayerState extends GameState {
 			inGame = true;
 			state = 3;
 			for(int i = 0; i < 8; i++) {
-				createParticles(you.getX(), you.getY());
+				createParticles(player.getX(), player.getY());
 			}
 
 		}
@@ -409,11 +401,11 @@ public class MultiplayerState extends GameState {
 
 		if(state == 3)
 		{
-			you.setLeft(GameKeys.isDown(GameKeys.LEFT));
-			you.setUp(GameKeys.isDown(GameKeys.UP));
-			you.setRight(GameKeys.isDown(GameKeys.RIGHT));
+			player.setLeft(GameKeys.isDown(GameKeys.LEFT));
+			player.setUp(GameKeys.isDown(GameKeys.UP));
+			player.setRight(GameKeys.isDown(GameKeys.RIGHT));
 			if(GameKeys.isPressed(GameKeys.SPACE)) {
-				you.shoot();
+				player.shoot();
 			}
 
 		}
@@ -426,6 +418,11 @@ public class MultiplayerState extends GameState {
 		font.dispose();
 		lastNameFont.dispose();
 		firstNameFont.dispose();
+	}
+
+	public static Network getClient() {
+		// TODO Auto-generated method stub
+		return client.network;
 	}
 
 

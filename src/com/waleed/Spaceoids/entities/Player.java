@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.waleed.Spaceoids.gamestates.MultiplayerState;
 import com.waleed.Spaceoids.main.Spaceoids;
 import com.waleed.Spaceoids.managers.Jukebox;
 import com.waleed.Spaceoids.network.Network;
@@ -25,7 +26,7 @@ import com.waleed.Spaceoids.network.packets.PacketUpdateStats;
 public class Player extends SpaceObject {
 
 	private final int MAX_BULLETS = 4;
-	public ArrayList<Bullet> bullets;
+	private ArrayList<Bullet> bullets;
 
 	private float[] flamex;
 	private float[] flamey;
@@ -34,63 +35,45 @@ public class Player extends SpaceObject {
 	private boolean right;
 	private boolean up;
 
-	private float netRadians;
-
 	private float maxSpeed;
-	public float acceleration;
-	public float deceleration;
-	public float acceleratingTimer;
+	private float acceleration;
+	private float deceleration;
+	private float acceleratingTimer;
 
-	private float networkAcceleration;
-	private float nAT;
+	private boolean hit;
+	private boolean dead;
 
-	public boolean hit;
-	public boolean dead;
-
-	private boolean networkHit, networkDead;
 
 	private float hitTimer;
 	private float hitTime;
 	private Line2D.Float[] hitLines;
 	private Point2D.Float[] hitLinesVector;
 
-	private float netHitTimer;
-	private float netHitTime;
-	private Line2D.Float[] nTL;
-	private Point2D.Float[] nLV;
+	private Network network;
 
-	private float netDX, netDY, netX, netY;
-
-	public Network network;
-
-	private long score;
-	private int extraLives;
-	private long requiredScore;
-
-	private long networkScore;
-	private int networkLives;
+	private long score, requiredScore, networkScore;
+	private int extraLives, networkLives;
 
 
 	public boolean deathWrap = false;
 
 	private Spaceoids INSTANCE;
-
-	public float dt;
-	private float netRotationSpeed;
 	private boolean networkUp;
-
 	public boolean hasShot;
 	public int id;
+	private int frames;
 
 	public static boolean remove = false;
-	
+
+	private boolean networkDead;
+
 	public Player(ArrayList<Bullet> bullets) {
 
-		this.bullets = bullets;
+		this.setBullets(bullets);
 
 		x = Spaceoids.WIDTH / 2;
 		y = Spaceoids.HEIGHT / 2;
-			
+
 
 		maxSpeed = 300;
 		acceleration = 200;
@@ -116,7 +99,7 @@ public class Player extends SpaceObject {
 
 	public Player(float x, float y, ArrayList<Bullet> bullets) {
 
-		this.bullets = bullets;
+		this.setBullets(bullets);
 
 		this.x = x;
 		this.y = y;
@@ -196,7 +179,7 @@ public class Player extends SpaceObject {
 		setShape();
 		hit = dead = false;
 	}
-	
+
 	public float getX() { return this.x; }
 	public float getY() { return this.y; }
 	public float getDX() { return this.dx; }
@@ -212,16 +195,16 @@ public class Player extends SpaceObject {
 
 	public void shoot() {
 
-		if(bullets.size() == MAX_BULLETS) return;
-		bullets.add(new Bullet(x, y, radians, Color.WHITE));
+		if(getBullets().size() == MAX_BULLETS) return;
+		getBullets().add(new Bullet(x, y, radians, Color.WHITE));
 		Jukebox.play("shoot");
 		Spaceoids.cam.project(new Vector3(x, y, 0));
 
-		if(network != null && network.client.isConnected())
+		if(network != null && network.getClient().isConnected())
 		{
 			PacketUpdateBullet packet = new PacketUpdateBullet();
-			packet.bullet = bullets;
-			network.client.sendUDP(packet);
+			packet.bullet = getBullets();
+			network.getClient().sendUDP(packet);
 		}
 
 	}
@@ -266,7 +249,6 @@ public class Player extends SpaceObject {
 
 	public void update(float dt) {
 
-		this.dt = dt;
 		// check if hit
 		if(hit) {
 			hitTimer += dt;
@@ -343,98 +325,78 @@ public class Player extends SpaceObject {
 	{
 		this.id = id;
 	}
-	
-	public void updateMP(float delta)
-	{
-		network = Spaceoids.getClient();
 
-		if(this.x != netX || this.y != netY || this.dx != netDX || this.dy != netDY)
+	public void updateMP(float dt)
+	{
+		network = MultiplayerState.getClient();
+
+		if(frames == 6)
 		{
-			PacketUpdatePosition packet = new PacketUpdatePosition();
-			packet.x = x;
-			packet.y = y;
-			packet.dx = dx;
-			packet.dy = dy;
-			network.client.sendUDP(packet);
-			
-			this.netX = x;
-			this.netY = y;
-			this.netDX = dx;
-			this.netDY = dy;
+			PacketUpdatePosition position = new PacketUpdatePosition();
+			position.x = x;
+			position.y = y;
+			position.dx = dx;
+			position.dy = dy;
+			position.radians = radians;
+			position.rotationSpeed = rotationSpeed;
+			network.getClient().sendUDP(position);
+
+			PacketUpdateAcceleration acc = new PacketUpdateAcceleration();
+			acc.accleration = this.acceleration;
+			acc.acclerationTimer = this.acceleratingTimer;
+			network.getClient().sendUDP(acc);
+
+			frames = 0;
+
+		}else
+		{
+			frames++;
+			if(this.dead != networkDead)
+			{
+				PacketUpdateDeath packet = new PacketUpdateDeath();
+				packet.death = this.dead;
+				network.getClient().sendUDP(packet);
+
+			}
+
+			if(this.networkUp != this.up)
+			{
+				PacketUpdateFlames packet = new PacketUpdateFlames();
+				packet.up = this.up;
+				network.getClient().sendUDP(packet);
+
+				this.networkUp = this.up;
+			}
+
+			if(networkLives != this.getLives() || this.networkScore != this.score)
+			{
+				PacketUpdateStats packet = new PacketUpdateStats();
+				packet.score = this.score;
+				packet.extraLives = this.extraLives;
+				network.getClient().sendUDP(packet);
+
+				this.networkScore = this.score;
+				this.networkLives = this.extraLives;
+			}
 		}
 
 		/*if(this.hit != this.networkHit || this.hitTimer != this.netHitTimer || this.hitTime != this.netHitTime)
-		{
-			PacketUpdateHit packet = new PacketUpdateHit();
-			packet.hit = this.hit;
-			packet.hitTimer = this.hitTimer;
-			packet.hitTime = this.hitTime;
-			packet.netHitLines = this.hitLines;
-			packet.netHitLinesVec = this.hitLinesVector;
+	{
+		PacketUpdateHit packet = new PacketUpdateHit();
+		packet.hit = this.hit;
+		packet.hitTimer = this.hitTimer;
+		packet.hitTime = this.hitTime;
+		packet.netHitLines = this.hitLines;
+		packet.netHitLinesVec = this.hitLinesVector;
 
-			network.client.sendUDP(packet);
-			
-			this.networkHit = this.hit;
-			this.netHitTimer = this.hitTimer;
-			this.netHitTime = this.hitTime;
+		network.client.sendUDP(packet);
 
-		}*/
+		this.networkHit = this.hit;
+		this.netHitTimer = this.hitTimer;
+		this.netHitTime = this.hitTime;
 
+	}*/
 
-		if(this.dead != this.networkDead)
-		{
-			PacketUpdateDeath packet = new PacketUpdateDeath();
-			packet.death = this.dead;
-			network.client.sendUDP(packet);
-
-			this.networkDead = this.dead;
-		}
-
-		if(this.radians != netRadians || this.rotationSpeed != this.netRotationSpeed)
-		{
-			PacketUpdateRotation packet = new PacketUpdateRotation();
-			packet.radians = this.radians;
-			packet.rotationSpeed = this.rotationSpeed;
-			network.client.sendUDP(packet);
-
-			this.netRotationSpeed = this.rotationSpeed;
-			this.netRadians = this.radians;
-		}
-
-		if(this.nAT != this.acceleratingTimer || this.networkAcceleration != this.acceleration)
-		{
-			PacketUpdateAcceleration packet = new PacketUpdateAcceleration();
-			packet.accleration = this.acceleration;
-			packet.acclerationTimer = this.acceleratingTimer;
-			network.client.sendUDP(packet);
-
-			this.nAT = this.acceleratingTimer;
-			this.networkAcceleration = this.acceleration;
-		}
-
-		if(this.networkUp != this.up)
-		{
-			PacketUpdateFlames packet = new PacketUpdateFlames();
-			packet.up = this.up;
-			network.client.sendUDP(packet);
-
-			this.networkUp = this.up;
-		}
-
-		if(this.networkLives != this.getLives() || this.networkScore != this.score)
-		{
-			PacketUpdateStats packet = new PacketUpdateStats();
-			packet.score = this.score;
-			packet.extraLives = this.extraLives;
-			network.client.sendUDP(packet);
-
-			this.networkScore = this.score;
-			this.networkLives = this.extraLives;
-		}
-
-
-
-		this.dt = delta;
 		// check if hit
 		if(hit) {
 			hitTimer += dt;
@@ -508,7 +470,7 @@ public class Player extends SpaceObject {
 		wrap();
 	}
 
-	
+
 
 
 	public void draw(ShapeRenderer sr) {
@@ -558,6 +520,14 @@ public class Player extends SpaceObject {
 
 	public void decreaseScore(int i) {
 		this.score -= i;
+	}
+
+	public ArrayList<Bullet> getBullets() {
+		return bullets;
+	}
+
+	public void setBullets(ArrayList<Bullet> bullets) {
+		this.bullets = bullets;
 	}
 
 }

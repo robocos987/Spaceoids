@@ -97,11 +97,6 @@ public class Spaceoids implements ApplicationListener {
 	public void pause() {}
 	public void resume() {}
 	public void dispose() {}
-	
-	public static Network getClient() {
-		// TODO Auto-generated method stub
-		return MultiplayerState.INSTANCE != null && MultiplayerState.INSTANCE.client.network != null ? MultiplayerState.INSTANCE.client.network : null;
-	}
 
 	
 	public void checkForUpdate()

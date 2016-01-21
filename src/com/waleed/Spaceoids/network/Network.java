@@ -30,12 +30,12 @@ import com.waleed.Spaceoids.network.packets.PacketWelcome;
 
 public class Network extends Listener {
 
-	public Client client;
-	String ip;
-	int port;
-	public String reason;
-	Player player;
-	public boolean kicked;
+	private Client client;
+	private String ip;
+	private int port = 911;
+	private String reason;
+	private Player player;
+	private boolean kicked;
 
 
 	public void connect(String ip, int port, int udport, Player player)
@@ -43,13 +43,13 @@ public class Network extends Listener {
 		this.ip = ip;
 		this.port = port;
 		this.player = player;
-		client = new Client();
-		register(client.getKryo());
-		client.addListener(this);
+		setClient(new Client());
+		register(getClient().getKryo());
+		getClient().addListener(this);
 
-		client.start();
+		getClient().start();
 		try {
-			client.connect(5000, ip, port, port + 1);
+			getClient().connect(5000, ip, port, port + 1);
 		} catch (IOException e) {
 			reason = e.toString();
 			e.printStackTrace();
@@ -102,7 +102,7 @@ public class Network extends Listener {
 			packetStats.extraLives = this.player.getLives();
 			packetStats.score = this.player.getScore();
 
-			this.client.sendTCP(packetStats);
+			this.getClient().sendTCP(packetStats);
 
 		}else if(o instanceof PacketRemovePlayer)
 		{
@@ -113,7 +113,7 @@ public class Network extends Listener {
 			}else
 			{
 				reason = packet.reason;
-				this.kicked = true;
+				this.setKicked(true);
 			}
 
 		}else if(o instanceof PacketUpdatePosition)
@@ -178,12 +178,12 @@ public class Network extends Listener {
 		}else if(o instanceof PacketAsteroids)
 		{
 			PacketAsteroids packet = (PacketAsteroids) o;
-			MultiplayerState.INSTANCE.asteroids = packet.asteroids;
+//			MultiplayerState.INSTANCE.asteroids = packet.asteroids;
 		}else if(o instanceof PacketChatMessage)
 		{
 			PacketChatMessage packet = (PacketChatMessage) o;
 //			MultiplayerState.INSTANCE.message = packet.message;
-			MultiplayerState.INSTANCE.countDown = 7.0F;
+//			MultiplayerState.countDown = 7.0F;
 		}else if(o instanceof PacketUpdatePosition)
 		{
 			PacketUpdatePosition packet = (PacketUpdatePosition) o;
@@ -212,5 +212,21 @@ public class Network extends Listener {
 	public String getReason()
 	{
 		return reason;
+	}
+
+	public Client getClient() {
+		return client;
+	}
+
+	public void setClient(Client client) {
+		this.client = client;
+	}
+
+	public boolean isKicked() {
+		return kicked;
+	}
+
+	public void setKicked(boolean kicked) {
+		this.kicked = kicked;
 	}
 }

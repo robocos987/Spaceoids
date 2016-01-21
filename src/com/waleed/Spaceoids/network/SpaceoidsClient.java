@@ -16,19 +16,19 @@ public class SpaceoidsClient extends Listener {
 	}
 
 	public boolean isConnected() {
-		return network.client.isConnected();
+		return network.getClient().isConnected();
 	}
 	
 	public boolean isKicked()
 	{
-		return network.kicked && !isConnected();
+		return network.isKicked() && !isConnected();
 	}
 	
 	public String getReason()
 	{
 		if(!isConnected())
 		{
-			return network.reason;
+			return network.getReason();
 		}
 		return "Connected!";
 	}
