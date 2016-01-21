@@ -261,10 +261,12 @@ public class MultiplayerState extends GameState {
 			totalPlayers = client.players.size() + 1;
 			for(PlayerMP mpPlayer: client.players.values())
 			{
+				sr.setColor(1, 500, 1, 10);
 				mpPlayer.draw(sr);
 
 				for(int i = 0; i < mpPlayer.bullets.size(); i++)
 				{
+					sr.setColor(1, 1, 1, 1);
 					mpPlayer.bullets.get(i).draw(sr);
 				}
 			}

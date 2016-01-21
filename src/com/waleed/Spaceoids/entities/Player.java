@@ -337,7 +337,7 @@ public class Player extends SpaceObject {
 			position.y = y;
 			position.dx = dx;
 			position.dy = dy;
-			position.radians = radians;
+			position.radians = radians + (float)(Math.PI);
 			position.rotationSpeed = rotationSpeed;
 			network.getClient().sendUDP(position);
 

@@ -6,12 +6,17 @@
 	<classpathentry kind="lib" path="libs/commons-collections4-4.0.jar"/>
 	<classpathentry kind="lib" path="libs/commons-lang3-3.4.jar"/>
 	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl-natives.jar"/>
-	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl-sources.jar"/>
 	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl.jar"/>
-	<classpathentry kind="lib" path="libs/gdx-sources.jar"/>
 	<classpathentry kind="lib" path="libs/gdx.jar"/>
 	<classpathentry kind="lib" path="libs/gdx-natives.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-backend-android.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-backend-gwt.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-backend-headless.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-backend-jglfw-natives.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-backend-jglfw.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-backend-robovm.jar"/>
 	<classpathentry kind="lib" path="libs/gdx-freetype-natives.jar"/>
-	<classpathentry kind="lib" path="libs/gdx-freetype.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-openal.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-freetype-0.9.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -275,23 +275,26 @@ public class PlayerMP extends SpaceObject {
 			Jukebox.play("extralife");
 		}
 		
-		if(up) {
-			dx += MathUtils.cos(radians) * acceleration * dt;
-			dy += MathUtils.sin(radians) * acceleration * dt;
-			acceleratingTimer += dt;
-			if(acceleratingTimer > 0.1f) {
-				acceleratingTimer = 0;
-			}
-		}
-		else {
-			acceleratingTimer = 0;
-		}
+	
 		
 		cpd += dt;
-		float delta = min(cpd * 6.0f, 1); //This should be right, but if you notice small halts in movement, try tweaking the six to a different value.
-		this.x       = lerp(ppx+ppdx*delta,npx-npdx*delta,delta);
-		this.y       = lerp(ppy+ppdy*delta,npy-npdy*delta,delta);
-		this.radians = lerp(ppr+ppdr*delta,npr-npdr*delta,delta); //approximate quadratic bezier interpolation
+		float delta = min(cpd * 8.0f, 1); //This should be right, but if you notice small halts in movement, try tweaking the six to a different value.
+		this.x = lerp(ppx + ppdx*delta, npx - npdx * delta, delta);
+		this.y = lerp(ppy + ppdy*delta, npy - npdy * delta, delta);
+		this.radians = lerp(ppr + ppdr * delta, npr - npdr * delta, delta); //approximate quadratic bezier interpolation
+		
+		
+//		if(up) {
+//			dx += MathUtils.cos(radians) * acceleration * dt;
+//			dy += MathUtils.sin(radians) * acceleration * dt;
+//			acceleratingTimer += dt;
+//			if(acceleratingTimer > 0.1f) {
+//				acceleratingTimer = 0;
+//			}
+//		}
+//		else {
+//			acceleratingTimer = 0;
+//		}
 		
 		// set shape
 		setShape();
