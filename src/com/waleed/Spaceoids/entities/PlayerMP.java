@@ -275,14 +275,6 @@ public class PlayerMP extends SpaceObject {
 			Jukebox.play("extralife");
 		}
 		
-		// turning
-		if(left) {
-			radians += rotationSpeed * dt;
-		}
-		else if(right) {
-			radians -= rotationSpeed * dt;
-		}
-		
 		if(up) {
 			dx += MathUtils.cos(radians) * acceleration * dt;
 			dy += MathUtils.sin(radians) * acceleration * dt;
@@ -295,10 +287,12 @@ public class PlayerMP extends SpaceObject {
 			acceleratingTimer = 0;
 		}
 		
+		cpd += dt;
+		float delta = cpd * 6.0; //This should be right, but if you notice small halts in movement, try tweaking the six to a different value.
+		this.x       = lerp(ppx+ppdx*delta,npx-npdx*delta,delta);
+		this.y       = lerp(ppy+ppdy*delta,npy-npdy*delta,delta);
+		this.radians = lerp(ppr+ppdr*delta,npr-npdr*delta,delta); //approximate quadratic bezier interpolation
 		
-		// set position
-		this.x += dx * dt;
-		this.y += dy * dt;
 		// set shape
 		setShape();
 		
@@ -309,6 +303,11 @@ public class PlayerMP extends SpaceObject {
 		
 		// screen wrap
 		wrap();
+	}
+	
+	public float lerp(float a, float b, float x)
+	{
+		return (b-a)*x+a;
 	}
 	
 	public void draw(ShapeRenderer sr) {
