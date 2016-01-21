@@ -49,6 +49,7 @@ public class PlayerMP extends SpaceObject {
 	public Vector2 newCoords;	
 	public float ppx, ppdx, npx, npdx;
 	public float ppy, ppdy, npy, npdy;
+	public float ppr, ppdr, npr, npdr;
 	public float cpd; //current packet delta
 	
 	public PlayerMP(int id, ArrayList<Bullet> bullets) {
