@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+<<<<<<< HEAD
 
 
 
@@ -14,6 +15,8 @@ import java.util.List;
 
 
 
+=======
+>>>>>>> 159ab51240f8f38f3da39c687e88453230c28936
 import org.lwjgl.input.Keyboard;
 
 import com.badlogic.gdx.Gdx;
@@ -117,8 +120,6 @@ public class MultiplayerState extends GameState {
 		ip = GameStateManager.ip;
 		port = GameStateManager.port;
 
-
-
 	}
 
 	private void createParticles(float x, float y) {
@@ -192,12 +193,16 @@ public class MultiplayerState extends GameState {
 			}
 		}
 	}
+<<<<<<< HEAD
 
 
 
 
 
 
+=======
+	
+>>>>>>> 159ab51240f8f38f3da39c687e88453230c28936
 	public String getIP()
 	{		
 		String ipAddr = "";
@@ -229,7 +234,10 @@ public class MultiplayerState extends GameState {
 	}
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 159ab51240f8f38f3da39c687e88453230c28936
 	@Override
 	public void draw() {
 		sb.setProjectionMatrix(Spaceoids.cam.combined);
@@ -238,20 +246,19 @@ public class MultiplayerState extends GameState {
 		if(client.isConnected())
 		{
 			if(inGame)
-			{
 				state = 3;
-			}else
-			{
+			else
 				state = 0;
-			}
 		}else if(client.isKicked())
-		{
 			state = 2;
+<<<<<<< HEAD
 			client.network.client.close();
 		}else
 		{
+=======
+		else
+>>>>>>> 159ab51240f8f38f3da39c687e88453230c28936
 			state = 1;
-		}
 
 
 		if(state == 0)
@@ -333,7 +340,12 @@ public class MultiplayerState extends GameState {
 
 			for(PlayerMP mpPlayer: client.players.values())
 			{
+<<<<<<< HEAD
 				idFont.draw(sb, "ID: " + mpPlayer.getID(), mpPlayer.getX() - 20, mpPlayer.getY() + 10);
+=======
+				PlayerMP player = mpPlayer.getPlayer();
+				idFont.draw(sb, "ID: " + player.getID(), player.getPosition().getX() - 20, player.getPosition().getY() + 10);
+>>>>>>> 159ab51240f8f38f3da39c687e88453230c28936
 			}
 
 			if(message != null && !message.isEmpty())

@@ -8,9 +8,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
+<<<<<<< HEAD
 import com.badlogic.gdx.math.Vector2;
+=======
+import com.badlogic.gdx.Vector2;
+>>>>>>> 159ab51240f8f38f3da39c687e88453230c28936
 import com.waleed.Spaceoids.main.Spaceoids;
 import com.waleed.Spaceoids.managers.Jukebox;
+
 
 public class PlayerMP extends SpaceObject {
 	
@@ -28,14 +33,16 @@ public class PlayerMP extends SpaceObject {
 	public float acceleration;
 	public float deceleration;
 	public float acceleratingTimer;
+<<<<<<< HEAD
 	public float dt;
 	
+=======
+
+>>>>>>> 159ab51240f8f38f3da39c687e88453230c28936
 	public boolean hit;
 	public boolean dead;
 	
 	public float time;
-
-	
 	public float hitTimer;
 	public float hitTime;
 	public Line2D.Float[] hitLines;
@@ -46,19 +53,36 @@ public class PlayerMP extends SpaceObject {
 	private long requiredScore;
 	
 	public boolean deathWrap = false;
+<<<<<<< HEAD
+=======
+	
+>>>>>>> 159ab51240f8f38f3da39c687e88453230c28936
 	public static boolean remove = false;
 	public int id;
+<<<<<<< HEAD
 	public Vector2 newCoords;
+=======
+	
+	public Vector2 position, speed;
+>>>>>>> 159ab51240f8f38f3da39c687e88453230c28936
 		
-	public PlayerMP(int id, float x, float y, ArrayList<Bullet> bullets) {
+	public PlayerMP(int id, ArrayList<Bullet> bullets) {
 		
 		
 		this.bullets = new ArrayList<Bullet>();
 		
 		this.id = id;
 		
+<<<<<<< HEAD
 		this.x = x;
 		this.y = y;
+=======
+		x = Spaceoids.WIDTH / 2;
+		y = Spaceoids.HEIGHT / 2;
+		
+		position = new Vector2(x, y);
+		speed = new Vector2(0, 0);
+>>>>>>> 159ab51240f8f38f3da39c687e88453230c28936
 		
 		this.newCoords = new Vector2(x, y);
 		
@@ -119,30 +143,30 @@ public class PlayerMP extends SpaceObject {
 	}
 	
 	private void setShape() {
-		shapex[0] = x + MathUtils.cos(radians) * 8;
-		shapey[0] = y + MathUtils.sin(radians) * 8;
+		shapex[0] = position.getX() + MathUtils.cos(radians) * 8;
+		shapey[0] = position.getY() + MathUtils.sin(radians) * 8;
 		
-		shapex[1] = x + MathUtils.cos(radians - 4 * 3.1415f / 5) * 8;
-		shapey[1] = y + MathUtils.sin(radians - 4 * 3.1415f / 5) * 8;
+		shapex[1] = position.getX() + MathUtils.cos(radians - 4 * 3.1415f / 5) * 8;
+		shapey[1] = position.getY() + MathUtils.sin(radians - 4 * 3.1415f / 5) * 8;
 		
-		shapex[2] = x + MathUtils.cos(radians + 3.1415f) * 5;
-		shapey[2] = y + MathUtils.sin(radians + 3.1415f) * 5;
+		shapex[2] = position.getX() + MathUtils.cos(radians + 3.1415f) * 5;
+		shapey[2] = position.getY() + MathUtils.sin(radians + 3.1415f) * 5;
 		
-		shapex[3] = x + MathUtils.cos(radians + 4 * 3.1415f / 5) * 8;
-		shapey[3] = y + MathUtils.sin(radians + 4 * 3.1415f / 5) * 8;
+		shapex[3] = position.getX() + MathUtils.cos(radians + 4 * 3.1415f / 5) * 8;
+		shapey[3] = position.getY() + MathUtils.sin(radians + 4 * 3.1415f / 5) * 8;
 	}
 	
 	private void setFlame() {
-		flamex[0] = x + MathUtils.cos(radians - 5 * 3.1415f / 6) * 5;
-		flamey[0] = y + MathUtils.sin(radians - 5 * 3.1415f / 6) * 5;
+		flamex[0] = position.getX() + MathUtils.cos(radians - 5 * 3.1415f / 6) * 5;
+		flamey[0] = position.getY() + MathUtils.sin(radians - 5 * 3.1415f / 6) * 5;
 		
-		flamex[1] = x + MathUtils.cos(radians - 3.1415f) *
+		flamex[1] =  position.getX() + MathUtils.cos(radians - 3.1415f) *
 					(6 + acceleratingTimer * 50);
-		flamey[1] = y + MathUtils.sin(radians - 3.1415f) *
+		flamey[1] = position.getY() + MathUtils.sin(radians - 3.1415f) *
 				(6 + acceleratingTimer * 50);
 		
-		flamex[2] = x + MathUtils.cos(radians + 5 * 3.1415f / 6) * 5;
-		flamey[2] = y + MathUtils.sin(radians + 5 * 3.1415f / 6) * 5;
+		flamex[2] = position.getX() + MathUtils.cos(radians + 5 * 3.1415f / 6) * 5;
+		flamey[2] = position.getY() + MathUtils.sin(radians + 5 * 3.1415f / 6) * 5;
 	}
 	
 	public void setLeft(boolean b) { left = b; }
@@ -158,15 +182,14 @@ public class PlayerMP extends SpaceObject {
 	}
 	
 	public void setPosition(float x, float y) {
-		super.setPosition(x, y);
+		this.position.set(x, y);
 		setShape();
 	}
 	
 	public boolean isHit() { return hit; }
 	public boolean isDead() { return dead; }
 	public void reset() {
-		x = Spaceoids.WIDTH / 2;
-		y = Spaceoids.HEIGHT / 2;
+	  position = new Vector2(SpaceoidsMain.WIDTH / 2, SpaceoidsMain.HEIGHT / 2);
 		setShape();
 		hit = dead = false;
 	}
@@ -182,7 +205,7 @@ public class PlayerMP extends SpaceObject {
 	public void shoot() {
 		if(bullets.size() == MAX_BULLETS) return;
 		bullets.add(new Bullet(x, y, radians, new Color(1, 500, 1, 10)));
-		Jukebox.play("shoot"); 
+		Jukebox.play("shoot");
 	}
 	
 	
@@ -225,6 +248,26 @@ public class PlayerMP extends SpaceObject {
 		
 	}
 	
+	public float getX()
+	{
+	  return this.position.getX();
+	}
+	
+	public float getY()
+	{
+	   return this.position.getY();
+	}
+	
+	public float getDX()
+	{
+	  return this.speed.getX();
+	}
+	
+	public float getDY()
+	{
+	  return this.speed.getY();
+	}
+	
 	public void update(float dt) {
 		this.dt = dt;
 		// check if hit
@@ -263,8 +306,8 @@ public class PlayerMP extends SpaceObject {
 		}
 		
 		if(up) {
-			dx += MathUtils.cos(radians) * acceleration * dt;
-			dy += MathUtils.sin(radians) * acceleration * dt;
+			speed.x += MathUtils.cos(radians) * acceleration * dt;
+			speed.y += MathUtils.sin(radians) * acceleration * dt;
 			acceleratingTimer += dt;
 			if(acceleratingTimer > 0.1f) {
 				acceleratingTimer = 0;
@@ -276,11 +319,19 @@ public class PlayerMP extends SpaceObject {
 		
 		
 		// set position
+<<<<<<< HEAD
 		this.x += dx * dt;
 		this.y += dy * dt;
 		// set shape
 		setShape();
 		
+=======
+		//x += dx * dt;
+		//y += dy * dt;
+		this.position.add(speed.x * dt, speed.y * dt);
+		this.speed.scl(1 - (0.98f * dt)); // Linear dampening, otherwise the ball will keep going at the original velocity forever
+
+>>>>>>> 159ab51240f8f38f3da39c687e88453230c28936
 		// set flame
 		if(up) {
 			setFlame();
