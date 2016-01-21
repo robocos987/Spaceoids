@@ -46,7 +46,11 @@ public class PlayerMP extends SpaceObject {
 	public boolean deathWrap = false;
 	public static boolean remove = false;
 	public int id;
-	public Vector2 newCoords;		
+	public Vector2 newCoords;	
+	public float ppx, ppdx, npx, npdx;
+	public float ppy, ppdy, npy, npdy;
+	public float cpd; //current packet delta
+	
 	public PlayerMP(int id, ArrayList<Bullet> bullets) {
 		
 		
