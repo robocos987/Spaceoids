@@ -22,8 +22,6 @@ public class PlayerMP extends SpaceObject {
 	private float[] flamex;
 	private float[] flamey;
 	
-	private boolean left;
-	private boolean right;
 	public boolean up;
 	
 	private float maxSpeed;
@@ -147,8 +145,6 @@ public class PlayerMP extends SpaceObject {
 		flamey[2] = y + MathUtils.sin(radians + 5 * 3.1415f / 6) * 5;
 	}
 	
-	public void setLeft(boolean b) { left = b; }
-	public void setRight(boolean b) { right = b; }
 	public void setUp(boolean b) {
 		if(b && !up && !hit) {
 			Jukebox.loop("thruster");
@@ -188,45 +184,7 @@ public class PlayerMP extends SpaceObject {
 	}
 	
 	
-	
-	public void hit() {
-		
-		if(hit) return;
-		
-		hit = true;
-		dx = dy = 0;
-		left = right = up = false;
-		Jukebox.stop("thruster");
-		
-		hitLines = new Line2D.Float[4];
-		for(int i = 0, j = hitLines.length - 1;
-			i < hitLines.length;
-			j = i++) {
-			hitLines[i] = new Line2D.Float(
-						shapex[i], shapey[i], shapex[j], shapey[j]
-						);
-		}
-		
-		hitLinesVector = new Point2D.Float[4];
-		hitLinesVector[0] = new Point2D.Float(
-			MathUtils.cos(radians + 1.5f),
-			MathUtils.sin(radians + 1.5f)
-		);
-		hitLinesVector[1] = new Point2D.Float(
-			MathUtils.cos(radians - 1.5f),
-			MathUtils.sin(radians - 1.5f)
-		);
-		hitLinesVector[2] = new Point2D.Float(
-			MathUtils.cos(radians - 2.8f),
-			MathUtils.sin(radians - 2.8f)
-		);
-		hitLinesVector[3] = new Point2D.Float(
-			MathUtils.cos(radians + 2.8f),
-			MathUtils.sin(radians + 2.8f)
-		);
-		
-	}
-	
+
 	public float getX()
 	{
 	  return this.x;
@@ -248,40 +206,21 @@ public class PlayerMP extends SpaceObject {
 	}
 	
 	public void update(float dt) {
-		// check if hit
-				
-		if(hit) {
-			hitTimer += dt;
-			if(hitTimer > hitTime) {
-				dead = true;
-				hitTimer = 0;
-			}
-			/*for(int i = 0; i < hitLines.length; i++) {
-				hitLines[i].setLine(
-					hitLines[i].x1 + hitLinesVector[i].x * 10 * dt,
-					hitLines[i].y1 + hitLinesVector[i].y * 10 * dt,
-					hitLines[i].x2 + hitLinesVector[i].x * 10 * dt,
-					hitLines[i].y2 + hitLinesVector[i].y * 10 * dt
-				);
-			}
-			*/
-			return;
-		}
-		
-		// check extra lives
-		if(score >= requiredScore) {
-			extraLives++;
-			requiredScore += 10000;
-			Jukebox.play("extralife");
-		}
-		
-	
-		
 		cpd += dt;
-		float delta = min(cpd * 8.0f, 1); //This should be right, but if you notice small halts in movement, try tweaking the six to a different value.
+		float delta = min(cpd * 2.0f, 1); //This should be right, but if you notice small halts in movement, try tweaking the six to a different value.
 		this.x = lerp(ppx + ppdx*delta, npx - npdx * delta, delta);
 		this.y = lerp(ppy + ppdy*delta, npy - npdy * delta, delta);
 		this.radians = lerp(ppr + ppdr * delta, npr - npdr * delta, delta); //approximate quadratic bezier interpolation
+		
+		// set shape
+		setShape();
+		
+		// set flame
+		if(up)
+		    setFlame();
+		
+		// screen wrap
+		wrap();
 		
 		
 //		if(up) {
@@ -295,17 +234,6 @@ public class PlayerMP extends SpaceObject {
 //		else {
 //			acceleratingTimer = 0;
 //		}
-		
-		// set shape
-		setShape();
-		
-		// set flame
-		if(up) {
-			setFlame();
-		}
-		
-		// screen wrap
-		wrap();
 	}
 	
 	public float min(float a, float b)
@@ -318,6 +246,8 @@ public class PlayerMP extends SpaceObject {
 		return (b - a) * x + a;
 	}
 	
+	
+	
 	public void draw(ShapeRenderer sr) {
 		
 		sr.setColor(1, 500, 1, 10);
@@ -326,7 +256,7 @@ public class PlayerMP extends SpaceObject {
 		
 		// check if hit
 		if(hit) {
-			/*for(int i = 0; i < hitLines.length; i++) {
+			for(int i = 0; i < hitLines.length; i++) {
 				sr.line(
 					hitLines[i].x1,
 					hitLines[i].y1,
@@ -357,8 +287,6 @@ public class PlayerMP extends SpaceObject {
 				
 			}
 		}
-		
-		
 		sr.end();
 		
 	}
